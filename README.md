@@ -25,3 +25,4 @@ npm run build            # typecheck + build de producción
 ```
 
 Despliegue en Vercel: ver `docs/DESPLIEGUE.md`. También tiene `Dockerfile` (build + nginx).
+   Revisado por Neber Melo: página publicada en https://alertabarrio-frontend.vercel.app
