@@ -11,7 +11,9 @@ export const STATUS_LABEL: Record<ReportStatus, string> = {
 export const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 export const HOUR_BLOCKS = ["00:00–06:00", "06:00–12:00", "12:00–18:00", "18:00–24:00"];
 
-export const BOGOTA_CENTER: [number, number] = [4.655, -74.1];
+export const CITY_NAME = "Pasto";
+export const CITY_CENTER: [number, number] = [1.2125, -77.2805];
+export const CITY_ZOOM = 14;
 
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleString("es-CO", {
@@ -33,3 +35,19 @@ export function timeAgo(iso: string): string {
 export const pct = (v?: number | null) => (v === undefined || v === null ? "—" : `${Math.round(v * 100)}%`);
 
 export const km = (m: number) => `${(m / 1000).toFixed(1)} km`;
+
+/** Radio en metros para pintar cada celda del mapa de calor (segun la separacion de la grilla). */
+export function heatRadius(cells: { latitude: number }[]): number {
+  const lats = [...new Set(cells.map((c) => c.latitude))].sort((a, b) => a - b);
+  let step = Infinity;
+  for (let i = 1; i < lats.length; i++) step = Math.min(step, lats[i] - lats[i - 1]);
+  return Number.isFinite(step) ? Math.max(60, Math.round(step * 111_000 * 1.1)) : 150;
+}
+
+export function greeting(date = new Date()): string {
+  const h = date.getHours();
+  return h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches";
+}
+
+export const longDate = (date = new Date()) =>
+  date.toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });

@@ -166,3 +166,17 @@ export interface RankingRow {
   active_severity: number;
   subscribers: number;
 }
+
+export interface DashboardStats {
+  city: string;
+  total_reports: number;
+  by_status: Record<ReportStatus, number>;
+  active_alerts: number;
+  pending_moderation: number;
+  neighborhoods: number;
+  users: number;
+  this_week: number;
+  last_week: number;
+  timeline: { date: string; count: number }[];
+  by_type: { code: string; name: string; color: string; count: number }[];
+}

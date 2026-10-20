@@ -4,7 +4,7 @@ import { api } from "../api/client";
 import type { Heatmap } from "../api/types";
 import BaseMap from "../components/BaseMap";
 import { Card, DSTag, ErrorBox, StatusBadge } from "../components/ui";
-import { formatDate } from "../lib/format";
+import { formatDate, heatRadius } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 
 export default function MapPage() {
@@ -44,8 +44,8 @@ export default function MapPage() {
             <Circle
               key={`h${i}`}
               center={[c.latitude, c.longitude]}
-              radius={420}
-              pathOptions={{ stroke: false, fillColor: c.intensity > 0.6 ? "#dc2626" : c.intensity > 0.3 ? "#f97316" : "#facc15", fillOpacity: 0.12 + c.intensity * 0.45 }}
+              radius={heatRadius(heat.cells)}
+              pathOptions={{ stroke: false, fillColor: c.intensity > 0.6 ? "#dc2626" : c.intensity > 0.3 ? "#f97316" : "#facc15", fillOpacity: 0.05 + c.intensity * 0.3 }}
             />
           ))}
         {reports.data?.map((r) => (
