@@ -4,6 +4,7 @@ import { api } from "./api/client";
 import { useAuth } from "./auth/AuthContext";
 import { AssistantFab } from "./components/Assistant";
 import Icon, { type IconName } from "./components/Icon";
+import Logo from "./components/Logo";
 import { CITY_NAME } from "./lib/format";
 import { useAsync } from "./lib/useAsync";
 import AIPage from "./pages/AIPage";
@@ -79,7 +80,7 @@ function Shell() {
     <div className={`shell ${open ? "menu-open" : ""}`}>
       <aside className="sidebar">
         <Link to="/" className="side-brand">
-          <img src="/favicon.svg" alt="" width={32} height={32} />
+          <Logo size={36} />
           <span>
             AlertaBarrio
             <small>{CITY_NAME}, Nariño</small>

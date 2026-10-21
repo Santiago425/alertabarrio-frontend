@@ -26,6 +26,8 @@ export interface User {
   role: "citizen" | "moderator" | "admin";
   neighborhood?: Neighborhood | null;
   created_at: string;
+  two_factor_enabled?: boolean;
+  last_login_at?: string | null;
 }
 
 export interface TokenResponse {

@@ -8,6 +8,7 @@ interface AuthState {
   isModerator: boolean;
   signIn: (resp: TokenResponse) => void;
   signOut: () => void;
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -39,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const isModerator = user?.role === "moderator" || user?.role === "admin";
-  return <AuthContext.Provider value={{ user, loading, isModerator, signIn, signOut }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, isModerator, signIn, signOut, updateUser: setUser }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthState {
