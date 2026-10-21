@@ -30,7 +30,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
     setBusy(true);
     try {
       const r = await api.chat(q, user?.neighborhood?.id);
-      setMessages((m) => [...m, { from: "ai", text: r.answer, model: r.model }]);
+      setMessages((m) => [...m, { from: "ai", text: String(r?.answer ?? "No pude responder ahora."), model: r?.model ? String(r.model) : undefined }]);
     } catch (e) {
       setMessages((m) => [...m, { from: "ai", text: e instanceof Error ? e.message : "No pude responder ahora." }]);
     } finally {
@@ -66,7 +66,7 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
         )}
         {messages.map((m, i) => (
           <div key={i} className={`bubble ${m.from}`}>
-            {m.text}
+            <span>{m.text}</span>
             {m.model && <small>{m.model}</small>}
           </div>
         ))}

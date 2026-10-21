@@ -85,7 +85,13 @@ export default function MapPage() {
   };
 
   const toggleHeat = async () => {
-    if (!heat) setHeat(await api.heatmap());
+    if (!heat) {
+      try {
+        setHeat(await api.heatmap());
+      } catch {
+        return;
+      }
+    }
     setShowHeat(!showHeat);
   };
 
@@ -140,11 +146,11 @@ export default function MapPage() {
           <BaseMap height={620}>
             <FlyTo target={target} />
             {showHeat &&
-              heat?.cells.map((c, i) => (
+              heat?.cells?.map((c, i) => (
                 <Circle
                   key={`h${i}`}
                   center={[c.latitude, c.longitude]}
-                  radius={heatRadius(heat.cells)}
+                  radius={heatRadius(heat.cells ?? [])}
                   pathOptions={{ stroke: false, fillColor: c.intensity > 0.6 ? "#dc2626" : c.intensity > 0.3 ? "#f97316" : "#facc15", fillOpacity: 0.05 + c.intensity * 0.3 }}
                 />
               ))}
@@ -235,7 +241,7 @@ export default function MapPage() {
             </h3>
           </div>
           <ul className="insights">
-            {heat.insights.map((s) => (
+            {heat.insights?.map((s) => (
               <li key={s}>{s}</li>
             ))}
           </ul>

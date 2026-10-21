@@ -3,6 +3,7 @@ import { Link, Navigate, NavLink, Route, Routes, useLocation } from "react-route
 import { api } from "./api/client";
 import { useAuth } from "./auth/AuthContext";
 import { AssistantFab } from "./components/Assistant";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Icon, { type IconName } from "./components/Icon";
 import Logo from "./components/Logo";
 import { CITY_NAME } from "./lib/format";
@@ -73,7 +74,7 @@ function Shell() {
   const notes = useAsync(() => (user ? api.notifications() : Promise.resolve([])), [user?.id, location.pathname]);
   const subs = useAsync(() => (user ? api.mySubscriptions() : Promise.resolve([])), [user?.id]);
   const unread = notes.data?.filter((n) => !n.is_read).length ?? 0;
-  const initials = user?.full_name.split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
+  const initials = (user?.full_name ?? "").split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
   const title = TITLES[location.pathname] ?? "AlertaBarrio";
 
   return (
@@ -160,6 +161,7 @@ function Shell() {
         </header>
 
         <main className="content">
+          <ErrorBoundary resetKey={location.pathname}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/mapa" element={<MapPage />} />
@@ -174,9 +176,12 @@ function Shell() {
             <Route path="/moderacion" element={<Private moderator><Moderation /></Private>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          </ErrorBoundary>
         </main>
       </div>
-      <AssistantFab />
+      <ErrorBoundary>
+        <AssistantFab />
+      </ErrorBoundary>
     </div>
   );
 }
