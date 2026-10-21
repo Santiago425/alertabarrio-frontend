@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import type { DashboardStats, Heatmap, RankingRow, Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
-import { CityArt, Empty } from "../components/Art";
+import { Empty } from "../components/Art";
+import { Carrusel, FOTOS_PASTO } from "../components/Fotos";
 import { Franja, SolPastos } from "../components/Pasto";
 import BaseMap from "../components/BaseMap";
 import Icon, { type IconName } from "../components/Icon";
@@ -46,7 +47,7 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <CityArt className="welcome-art" />
+        <Carrusel fotos={FOTOS_PASTO} className="welcome-fotos" every={7000} />
         <Franja className="welcome-franja" height={12} />
         {ai !== "off" && (
           <span className={`live ${ai}`}>
