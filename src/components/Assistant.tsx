@@ -10,7 +10,7 @@ interface Message {
   model?: string;
 }
 
-const SUGGESTIONS = ["¿Qué barrio debo evitar hoy?", "¿A qué hora es más peligroso?", "¿Qué pasó en mi barrio?", "Dame consejos para caminar de noche"];
+const SUGGESTIONS = ["¿Qué barrio debo evitar hoy?", "Me robaron, ¿qué hago?", "¿Es seguro caminar por la Avenida Panamericana de noche?", "¿A qué hora es más peligroso?"];
 
 /** Chat con el asistente de IA (Gemini en el componente de IA, con respaldo por reglas). */
 export default function AssistantChat({ compact = false }: { compact?: boolean }) {
@@ -32,7 +32,8 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
     setText("");
     setBusy(true);
     try {
-      const r = await api.chat(q, user?.neighborhood?.id);
+      const history = messages.slice(-8).map((m) => ({ role: m.from === "user" ? ("user" as const) : ("assistant" as const), text: m.text.slice(0, 1500) }));
+      const r = await api.chat(q, user?.neighborhood?.id, history);
       setMessages((m) => [...m, { from: "ai", text: String(r?.answer ?? "No pude responder ahora."), model: r?.model ? String(r.model) : undefined }]);
     } catch (e) {
       setMessages((m) => [...m, { from: "ai", text: e instanceof Error ? e.message : "No pude responder ahora." }]);
