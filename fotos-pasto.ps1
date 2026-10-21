@@ -38,8 +38,14 @@ foreach ($f in $fotos) {
   }
   if (-not $elegida) { Write-Host "No encontre foto para $($f.file)" -ForegroundColor Yellow; continue }
 
+  $final = Join-Path $dest $f.file
+  if (Test-Path $final) { Write-Host "Ya estaba $($f.file)" }
+  else {
   $tmp = Join-Path $env:TEMP $f.file
-  Invoke-WebRequest -Uri $elegida.ii.thumburl -OutFile $tmp -UserAgent $ua
+  for ($i = 1; $i -le 5; $i++) {
+    try { Invoke-WebRequest -Uri $elegida.ii.thumburl -OutFile $tmp -UserAgent $ua; break }
+    catch { if ($i -eq 5) { throw }; Write-Host "Wikimedia pide esperar, reintento en $($i * 20) s..."; Start-Sleep -Seconds ($i * 20) }
+  }
   $src = [System.Drawing.Image]::FromFile($tmp)
   $w = [Math]::Min(1600, $src.Width); $h = [int]($src.Height * $w / $src.Width)
   $bmp = New-Object System.Drawing.Bitmap $w, $h
@@ -49,6 +55,8 @@ foreach ($f in $fotos) {
   $ep = New-Object System.Drawing.Imaging.EncoderParameters 1
   $ep.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter ([System.Drawing.Imaging.Encoder]::Quality), ([long]78)
   $bmp.Save((Join-Path $dest $f.file), $codec, $ep); $bmp.Dispose(); Remove-Item $tmp
+  Start-Sleep -Seconds 6
+  }
 
   $creditos += [ordered]@{
     file = $f.file
