@@ -3,7 +3,7 @@ import { CircleMarker, Polyline, Tooltip } from "react-leaflet";
 import { api } from "../api/client";
 import type { SafeRoute } from "../api/types";
 import BaseMap from "../components/BaseMap";
-import { Card, DSTag, ErrorBox } from "../components/ui";
+import { Card, ErrorBox } from "../components/ui";
 import { km } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 
@@ -31,13 +31,6 @@ export default function RoutePage() {
 
   return (
     <div className="stack-l">
-      <div>
-        <h2>Ruta más segura</h2>
-        <p className="muted">
-          Cada barrio es un vértice y cada vía una arista con su distancia. Dijkstra busca el camino de menor costo, castigando
-          los barrios con alertas activas. <DSTag>Graph + Dijkstra + BFS</DSTag>
-        </p>
-      </div>
       <div className="row gap-s wrap">
         <select value={from} onChange={(e) => setFrom(e.target.value)}>
           <option value="">Desde…</option>

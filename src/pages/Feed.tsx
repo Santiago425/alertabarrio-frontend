@@ -3,7 +3,7 @@ import { api } from "../api/client";
 import type { Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import ReportCard from "../components/ReportCard";
-import { Card, DSTag, ErrorBox, Loading } from "../components/ui";
+import { Card, ErrorBox, Loading } from "../components/ui";
 import { useAsync } from "../lib/useAsync";
 
 export default function Feed() {
@@ -17,17 +17,7 @@ export default function Feed() {
 
   return (
     <div className="stack-l">
-      <div className="row space wrap gap-s">
-        <div>
-          <h2>Alertas activas</h2>
-          <p className="muted">
-            {hood ? (
-              <>Feed del barrio, lo más reciente primero. <DSTag>LinkedList</DSTag></>
-            ) : (
-              <>Toda la ciudad ordenada por prioridad. <DSTag>merge sort</DSTag></>
-            )}
-          </p>
-        </div>
+      <div className="toolbar">
         <select value={hood ?? ""} onChange={(e) => setHood(e.target.value ? Number(e.target.value) : undefined)}>
           <option value="">Toda la ciudad</option>
           {neighborhoods.data?.map((n) => (
@@ -39,7 +29,7 @@ export default function Feed() {
       </div>
 
       {hood && (
-        <Card title="🤖 Resumen del día (IA)" actions={<small className="muted">{summary.data?.model}</small>}>
+        <Card title="Resumen del día · IA" actions={<small className="muted">{summary.data?.model}</small>}>
           {summary.loading ? <Loading text="Generando resumen…" /> : <p className="summary">{summary.data?.summary_text}</p>}
         </Card>
       )}
@@ -60,7 +50,6 @@ export function MyReports() {
   const mine = useAsync(() => api.myReports(), []);
   return (
     <div className="stack-l">
-      <h2>Mis reportes</h2>
       <ErrorBox message={mine.error} />
       {mine.loading && <Loading />}
       {mine.data?.length === 0 && <p className="muted">Aún no has hecho reportes.</p>}

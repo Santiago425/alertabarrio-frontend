@@ -40,7 +40,6 @@ export default function Notifications() {
         </ul>
       </Card>
       <Card title="Barrios que sigo">
-        <p className="muted">Recibes una notificación cuando se publica una alerta en estos barrios.</p>
         <div className="chips">
           {neighborhoods.data?.map((n) => (
             <button key={n.id} className={`chip ${subscribed.has(n.id) ? "on" : ""}`} onClick={() => toggle(n.id)}>
