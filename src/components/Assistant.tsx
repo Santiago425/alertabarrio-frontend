@@ -20,7 +20,10 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
   const [busy, setBusy] = useState(false);
   const end = useRef<HTMLDivElement>(null);
 
-  useEffect(() => end.current?.scrollIntoView({ block: "nearest" }), [messages, busy]);
+  // Con llaves: en navegadores nuevos scrollIntoView devuelve una promesa y React la tomaria como limpieza
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: "nearest" });
+  }, [messages, busy]);
 
   const ask = async (question: string) => {
     const q = question.trim();
