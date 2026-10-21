@@ -69,7 +69,9 @@ function Shell() {
   const { user, isModerator, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  useEffect(() => setOpen(false), [location.pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
 
   const notes = useAsync(() => (user ? api.notifications() : Promise.resolve([])), [user?.id, location.pathname]);
   const subs = useAsync(() => (user ? api.mySubscriptions() : Promise.resolve([])), [user?.id]);
