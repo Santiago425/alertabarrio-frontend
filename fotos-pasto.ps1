@@ -1,7 +1,7 @@
 # Descarga fotos libres (Wikimedia Commons) de Pasto y de seguridad para AlertaBarrio
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.Drawing
-$ua = "AlertaBarrio-proyecto/1.0 (estudiante)"
+$ua = "AlertaBarrioStudentProject/1.0 (https://github.com/Santiago425/alertabarrio-frontend)"
 $dest = Join-Path (Get-Location) "public\pasto"
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
 
@@ -22,7 +22,7 @@ $creditos = @()
 foreach ($f in $fotos) {
   $elegida = $null
   foreach ($q in $f.q) {
-    $url = "https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrlimit=30&prop=imageinfo&iiprop=url|size|mime|extmetadata&iiurlwidth=1600&format=json&gsrsearch=" + [uri]::EscapeDataString($q)
+    $url = "https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrlimit=30&prop=imageinfo&iiprop=url|size|mime|extmetadata&iiurlwidth=1280&format=json&gsrsearch=" + [uri]::EscapeDataString($q)
     $r = Invoke-RestMethod -Uri $url -UserAgent $ua
     if (-not $r.query) { continue }
     $pages = $r.query.pages.PSObject.Properties.Value | Sort-Object index
@@ -42,10 +42,12 @@ foreach ($f in $fotos) {
   if (Test-Path $final) { Write-Host "Ya estaba $($f.file)" }
   else {
   $tmp = Join-Path $env:TEMP $f.file
-  for ($i = 1; $i -le 5; $i++) {
-    try { Invoke-WebRequest -Uri $elegida.ii.thumburl -OutFile $tmp -UserAgent $ua; break }
-    catch { if ($i -eq 5) { throw }; Write-Host "Wikimedia pide esperar, reintento en $($i * 20) s..."; Start-Sleep -Seconds ($i * 20) }
+  $bajada = $false
+  for ($i = 1; $i -le 3; $i++) {
+    try { Invoke-WebRequest -Uri $elegida.ii.thumburl -OutFile $tmp -UserAgent $ua; $bajada = $true; break }
+    catch { Write-Host "Wikimedia pide esperar, reintento en $($i * 15) s..."; Start-Sleep -Seconds ($i * 15) }
   }
+  if (-not $bajada) { Write-Host "Salto $($f.file)" -ForegroundColor Yellow; continue }
   $src = [System.Drawing.Image]::FromFile($tmp)
   $w = [Math]::Min(1600, $src.Width); $h = [int]($src.Height * $w / $src.Width)
   $bmp = New-Object System.Drawing.Bitmap $w, $h
