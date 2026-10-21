@@ -247,12 +247,12 @@ const BLOCK_LABELS = ["Madrugada", "Mañana", "Tarde", "Noche"];
 
 function RiskSchedule({ heat }: { heat: Heatmap }) {
   // Un renglon por barrio (los 4 mas riesgosos) y una barra por cada franja horaria caliente
-  const hoods = heat.neighborhood_risk.slice(0, 4);
+  const hoods = (heat.neighborhood_risk ?? []).slice(0, 4);
   if (!hoods.length) return <p className="muted">Aún no hay suficiente historial.</p>;
   return (
     <div className="schedule">
       {hoods.map((h) => {
-        const spots = heat.hotspots.filter((x) => x.neighborhood_id === h.neighborhood_id).slice(0, 3);
+        const spots = (heat.hotspots ?? []).filter((x) => x.neighborhood_id === h.neighborhood_id).slice(0, 3);
         return (
           <div className="sched-row" key={h.neighborhood_id}>
             <span className="sched-name">{h.neighborhood_name}</span>

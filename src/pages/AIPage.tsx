@@ -19,10 +19,10 @@ export default function AIPage() {
   const radius = heatRadius(heat.data?.cells ?? []);
 
   // Matriz dia x franja para el barrio con mayor riesgo
-  const top = heat.data?.hotspots[0];
+  const top = heat.data?.hotspots?.[0];
   const topHood = top?.neighborhood_id;
   const matrix = DAYS.map((_, d) =>
-    HOUR_BLOCKS.map((_, b) => heat.data?.hotspots.find((h) => h.neighborhood_id === topHood && h.day_of_week === d && h.hour_block === b)?.risk_score ?? 0),
+    HOUR_BLOCKS.map((_, b) => heat.data?.hotspots?.find((h) => h.neighborhood_id === topHood && h.day_of_week === d && h.hour_block === b)?.risk_score ?? 0),
   );
 
   return (
@@ -44,7 +44,7 @@ export default function AIPage() {
         ) : (
           <>
             <BaseMap height={420}>
-              {heat.data?.cells.map((c, i) => (
+              {heat.data?.cells?.map((c, i) => (
                 <Circle
                   key={i}
                   center={[c.latitude, c.longitude]}
@@ -54,7 +54,7 @@ export default function AIPage() {
               ))}
             </BaseMap>
             <ul>
-              {heat.data?.insights.map((s) => (
+              {heat.data?.insights?.map((s) => (
                 <li key={s}>{s}</li>
               ))}
             </ul>
@@ -104,7 +104,7 @@ export default function AIPage() {
                   <td>{r.neighborhood}</td>
                   <td>{r.active_alerts}</td>
                   <td>{r.active_severity}</td>
-                  <td>{pct(heat.data?.neighborhood_risk.find((n) => n.neighborhood_id === r.neighborhood_id)?.risk_score)}</td>
+                  <td>{pct(heat.data?.neighborhood_risk?.find((n) => n.neighborhood_id === r.neighborhood_id)?.risk_score)}</td>
                 </tr>
               ))}
             </tbody>
