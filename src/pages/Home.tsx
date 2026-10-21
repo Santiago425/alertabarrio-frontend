@@ -4,6 +4,7 @@ import { api } from "../api/client";
 import type { DashboardStats, Heatmap, RankingRow, Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { CityArt, Empty } from "../components/Art";
+import { Franja, SolPastos } from "../components/Pasto";
 import BaseMap from "../components/BaseMap";
 import Icon, { type IconName } from "../components/Icon";
 import { CITY_NAME, DAYS, greeting, longDate, timeAgo } from "../lib/format";
@@ -27,6 +28,7 @@ export default function Home() {
   return (
     <div className="dash">
       <div className="dash-welcome">
+        <SolPastos size={260} tone="light" className="welcome-sol" />
         <div className="welcome-copy">
           <h2>
             {greeting()}
@@ -45,6 +47,7 @@ export default function Home() {
           </div>
         </div>
         <CityArt className="welcome-art" />
+        <Franja className="welcome-franja" height={12} />
         {ai !== "off" && (
           <span className={`live ${ai}`}>
             <i /> {aiOnline ? "IA en línea" : "Activando IA…"}
@@ -60,14 +63,14 @@ export default function Home() {
           {isModerator ? (
             <Tile icon="shield" title="Por moderar" value={s?.pending_moderation} sub="en la cola" to="/moderacion" tint="#f59e0b" />
           ) : (
-            <Tile icon="check" title="Verificadas" value={s?.by_status.verified} sub="confirmadas por vecinos" to="/feed" tint="#16a34a" />
+            <Tile icon="check" title="Verificadas" value={s?.by_status.verified} sub="confirmadas por vecinos" to="/feed" tint="#2c7458" />
           )}
           <Tile
             icon="chart"
             title="Esta semana"
             value={s?.this_week}
             sub={change === null ? "reportes" : `${change > 0 ? "▲" : "▼"} ${Math.abs(change)}% vs. anterior`}
-            tint="#6366f1"
+            tint="#c79a2c"
             to="/ia"
           />
         </div>
@@ -149,7 +152,7 @@ function Tile({
   value,
   sub,
   tone,
-  tint = "#e11d48",
+  tint = "#b5452b",
   to,
 }: {
   icon: IconName;
@@ -177,9 +180,9 @@ function Tile({
 
 function StatusRing({ stats }: { stats: DashboardStats }) {
   const rings = [
-    { label: "Verificados", value: stats.by_status.verified, color: "#e11d48" },
-    { label: "Publicados", value: stats.by_status.published, color: "#3b82f6" },
-    { label: "En moderación", value: stats.by_status.created + stats.by_status.in_review, color: "#a855f7" },
+    { label: "Verificados", value: stats.by_status.verified, color: "#b5452b" },
+    { label: "Publicados", value: stats.by_status.published, color: "#1f5f4a" },
+    { label: "En moderación", value: stats.by_status.created + stats.by_status.in_review, color: "#c79a2c" },
   ];
   const total = Math.max(1, stats.total_reports);
   return (
@@ -201,7 +204,7 @@ function StatusRing({ stats }: { stats: DashboardStats }) {
           const len = (r.value / total) * c;
           return (
             <g key={r.label}>
-              <circle cx="60" cy="60" r={radius} fill="none" stroke="#eceffa" strokeWidth="8" />
+              <circle cx="60" cy="60" r={radius} fill="none" stroke="#f0e9da" strokeWidth="8" />
               <circle
                 cx="60"
                 cy="60"
@@ -261,7 +264,7 @@ function RecentCards({ reports }: { reports: Report[] }) {
   );
 }
 
-const BLOCK_COLORS = ["#a855f7", "#3b82f6", "#f59e0b", "#e11d48"];
+const BLOCK_COLORS = ["#5d6f86", "#2c7458", "#c79a2c", "#b5452b"];
 const BLOCK_LABELS = ["Madrugada", "Mañana", "Tarde", "Noche"];
 
 function RiskSchedule({ heat }: { heat: Heatmap }) {
