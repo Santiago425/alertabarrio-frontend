@@ -90,7 +90,7 @@ export default function Moderation() {
               <StackView entries={lastStack.stack} />
             </>
           ) : (
-            <p className="muted">Cuando deshagas una acción, aquí verás cómo quedó la pila de estados del reporte.</p>
+            <p className="muted">Sin acciones deshechas.</p>
           )}
         </Card>
       </div>

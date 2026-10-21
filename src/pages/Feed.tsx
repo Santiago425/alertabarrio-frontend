@@ -29,7 +29,7 @@ export default function Feed() {
       </div>
 
       {hood && (
-        <Card title="Resumen del día · IA" actions={<small className="muted">{summary.data?.model}</small>}>
+        <Card title="Resumen del día · IA">
           {summary.loading ? <Loading text="Generando resumen…" /> : <p className="summary">{summary.data?.summary_text}</p>}
         </Card>
       )}

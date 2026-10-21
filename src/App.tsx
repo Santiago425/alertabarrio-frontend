@@ -51,10 +51,13 @@ function NavItem({ to, icon, label, end }: { to: string; icon: IconName; label: 
 }
 
 export default function App() {
+  const { user, loading } = useAuth();
   const location = useLocation();
   const isAuth = location.pathname === "/login" || location.pathname === "/registro";
 
-  if (isAuth) {
+  if (loading) return null;
+  if (!user) {
+    if (!isAuth) return <Navigate to="/login" replace />;
     return (
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -62,6 +65,7 @@ export default function App() {
       </Routes>
     );
   }
+  if (isAuth) return <Navigate to="/" replace />;
   return <Shell />;
 }
 
@@ -106,7 +110,7 @@ function Shell() {
             <p className="side-title">Mis barrios</p>
             {subs.data.slice(0, 5).map((s, i) => (
               <Link key={s.neighborhood.id} to="/feed" className="side-hood">
-                <i style={{ background: ["#fb7185", "#60a5fa", "#a78bfa", "#fbbf24", "#34d399"][i % 5] }} />
+                <i style={{ background: ["#fff", "#fde047", "#67e8f9", "#86efac", "#fda4af"][i % 5] }} />
                 {s.neighborhood.name}
               </Link>
             ))}

@@ -55,7 +55,6 @@ export default function MapPage() {
   const [locError, setLocError] = useState<string | null>(null);
   const markers = useRef<Record<number, L.Marker | null>>({});
 
-  // Refresco automatico cada 30 s para ver alertas "en tiempo real"
   useEffect(() => {
     const t = setInterval(() => reports.reload(), 30000);
     return () => clearInterval(t);

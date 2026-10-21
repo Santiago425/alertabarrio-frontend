@@ -16,6 +16,15 @@ const DEMO_USERS = [
   ["moderador@alertabarrio.co", "Moderador"],
 ];
 
+const FEATURES: { icon: IconName; title: string; text: string }[] = [
+  { icon: "plus", title: "Reporta incidentes", text: "Robos, riñas o daños con ubicación exacta." },
+  { icon: "map", title: "Mapa en vivo", text: "Mira las alertas de la ciudad en tiempo real." },
+  { icon: "bell", title: "Alertas de tu barrio", text: "Recibe avisos de los barrios que sigues." },
+  { icon: "sparkles", title: "Asistente con IA", text: "Pregunta qué zonas evitar y a qué hora." },
+  { icon: "route", title: "Ruta segura", text: "Encuentra el camino con menos riesgo." },
+  { icon: "shield", title: "Alertas verificadas", text: "Moderadores confirman cada reporte." },
+];
+
 function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="auth">
@@ -29,33 +38,20 @@ function AuthLayout({ children }: { children: ReactNode }) {
       </section>
       <aside className="auth-show">
         <div className="show-copy">
-          <span className="show-kicker">Pasto · 2026</span>
           <h2>Tu barrio, más seguro entre todos.</h2>
-          <p>Alertas en tiempo real, mapa de riesgo y un asistente con inteligencia artificial.</p>
+          <p>AlertaBarrio conecta a los vecinos de {CITY_NAME} para avisar y prevenir incidentes.</p>
         </div>
-        <div className="show-cards">
-          <div className="float-card a">
-            <span className="tile-icon hot-dot"><Icon name="alert" size={18} /></span>
-            <div>
-              <b>Robo reportado</b>
-              <small>Centro · hace 3 min</small>
-            </div>
-          </div>
-          <div className="float-card b">
-            <span className="tile-icon ai-dot"><Icon name="sparkles" size={18} /></span>
-            <div>
-              <b>“Evita la Calle 18 después de las 9 p. m.”</b>
-              <small>Asistente IA</small>
-            </div>
-          </div>
-          <div className="float-card c">
-            <span className="tile-icon ok-dot"><Icon name="check" size={18} /></span>
-            <div>
-              <b>Alerta verificada</b>
-              <small>2 vecinos confirmaron</small>
-            </div>
-          </div>
-        </div>
+        <ul className="features">
+          {FEATURES.map((f) => (
+            <li key={f.title}>
+              <span className="f-icon"><Icon name={f.icon} size={18} /></span>
+              <div>
+                <b>{f.title}</b>
+                <small>{f.text}</small>
+              </div>
+            </li>
+          ))}
+        </ul>
       </aside>
     </div>
   );
@@ -193,7 +189,6 @@ export function Login() {
   return (
     <AuthLayout>
       <h1 className="auth-title">Bienvenido de nuevo</h1>
-      <p className="muted">Inicia sesión para ver las alertas de tu barrio.</p>
       <form onSubmit={submit} className="form auth-fields">
         <Field icon="mail">
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="Correo electrónico" aria-label="Correo" required />
@@ -204,7 +199,7 @@ export function Login() {
           {busy ? "Entrando…" : "Iniciar sesión"}
         </button>
       </form>
-      <div className="divider"><span>o entra con una cuenta de prueba</span></div>
+      <div className="divider"><span>cuentas de prueba</span></div>
       <div className="demo-row">
         {DEMO_USERS.map(([mail, label]) => (
           <button
@@ -222,9 +217,6 @@ export function Login() {
       </div>
       <p className="auth-switch">
         ¿No tienes cuenta? <Link to="/registro">Regístrate gratis</Link>
-      </p>
-      <p className="secure-note">
-        <Icon name="lock" size={14} /> Conexión cifrada · contraseñas con bcrypt · verificación en dos pasos
       </p>
     </AuthLayout>
   );
@@ -268,7 +260,6 @@ export function Register() {
   return (
     <AuthLayout>
       <h1 className="auth-title">Crea tu cuenta</h1>
-      <p className="muted">Únete a los vecinos que cuidan {CITY_NAME}.</p>
       <form onSubmit={submit} className="form auth-fields">
         <Field icon="user">
           <input value={form.full_name} onChange={set("full_name")} autoComplete="name" placeholder="Nombre completo" aria-label="Nombre completo" required minLength={3} />
@@ -360,7 +351,6 @@ export function Account() {
               <Icon name="logout" size={16} /> Sesiones abiertas
             </h3>
           </div>
-          <p className="muted">¿Entraste desde otro celular o un computador público? Ciérralas todas con un clic.</p>
           <button className="btn ghost" onClick={logoutAll}>
             Cerrar sesión en todos los dispositivos
           </button>
@@ -435,7 +425,6 @@ function TwoFactorCard({ enabled, onChange }: { enabled: boolean; onChange: (u: 
         </h3>
         <span className={enabled ? "state-on" : "state-off"}>{enabled ? "Activada" : "Desactivada"}</span>
       </div>
-      <p className="muted">Además de tu contraseña, te pediremos un código de Google Authenticator o Microsoft Authenticator.</p>
 
       {!enabled && !setup && (
         <button className="btn" onClick={start} disabled={busy}>

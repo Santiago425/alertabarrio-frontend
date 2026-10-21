@@ -18,7 +18,6 @@ export default function AIPage() {
 
   const radius = heatRadius(heat.data?.cells ?? []);
 
-  // Matriz dia x franja para el barrio con mayor riesgo
   const top = heat.data?.hotspots?.[0];
   const topHood = top?.neighborhood_id;
   const matrix = DAYS.map((_, d) =>
@@ -31,13 +30,13 @@ export default function AIPage() {
 
       <div className="toolbar left">
         {status.data?.available ? (
-          <span className="pill-ai">● IA en línea · {String(status.data.summary)}</span>
+          <span className="pill-ai">● IA en línea</span>
         ) : (
           <span className="badge status-rejected">IA sin conexión</span>
         )}
       </div>
 
-      <Card title="Mapa de calor predictivo" actions={<small className="muted">{heat.data?.model}</small>}>
+      <Card title="Mapa de calor predictivo">
         <ErrorBox message={heat.error} />
         {heat.loading ? (
           <Loading text="La IA está analizando el histórico…" />
@@ -130,9 +129,6 @@ export default function AIPage() {
         }
       >
         {summary.loading ? <Loading text="Generando…" /> : <p className="summary">{summary.data?.summary_text}</p>}
-        <small className="muted">
-          Modelo: {summary.data?.model} {summary.data?.cached && "· (guardado en daily_summaries)"}
-        </small>
       </Card>
     </div>
   );

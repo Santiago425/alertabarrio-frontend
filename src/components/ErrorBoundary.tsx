@@ -31,7 +31,6 @@ export default class ErrorBoundary extends Component<Props, State> {
     return (
       <section className="panel crash">
         <h3>Algo no cargó bien</h3>
-        <p className="muted">Esta sección tuvo un problema. El resto de la app sigue funcionando.</p>
         <small className="muted">{this.state.error.message}</small>
         <div>
           <button className="btn" onClick={() => this.setState({ error: null })}>
