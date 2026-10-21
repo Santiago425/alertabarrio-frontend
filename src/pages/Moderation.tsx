@@ -54,7 +54,6 @@ export default function Moderation() {
 
   return (
     <div className="stack-l">
-      <h2>Panel de moderación</h2>
       {msg && <div className="alert-ok">{msg}</div>}
       <ErrorBox message={error} />
 

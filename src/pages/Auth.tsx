@@ -2,6 +2,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
+import Icon, { type IconName } from "../components/Icon";
 import { ErrorBox } from "../components/ui";
 import { CITY_NAME } from "../lib/format";
 import { PASSWORD_RULES, passwordBytes, passwordStrength } from "../lib/password";
@@ -14,20 +15,53 @@ const DEMO_USERS = [
 
 function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="auth-wrap">
-      <aside className="auth-side">
-        <div>
-          <p className="eyebrow">AlertaBarrio · {CITY_NAME}</p>
-          <h2>Tu barrio más seguro, entre todos.</h2>
-          <p>Reporta incidentes, recibe alertas de tu barrio y consulta las zonas de riesgo que detecta la IA.</p>
+    <div className="auth">
+      <section className="auth-form">
+        <Link to="/" className="auth-logo">
+          <img src="/favicon.svg" alt="" width={34} height={34} />
+          <span>AlertaBarrio</span>
+        </Link>
+        <div className="auth-inner">{children}</div>
+        <small className="muted">© {new Date().getFullYear()} AlertaBarrio · {CITY_NAME}</small>
+      </section>
+      <aside className="auth-show">
+        <div className="show-copy">
+          <h2>Tu barrio, más seguro entre todos.</h2>
+          <p>Alertas en tiempo real, mapa de riesgo y un asistente con inteligencia artificial.</p>
         </div>
-        <ul>
-          <li>🔒 <span>Contraseñas guardadas con <b>bcrypt</b>: ni nosotros podemos verlas.</span></li>
-          <li>🛡️ <span>Bloqueo automático después de 5 intentos fallidos.</span></li>
-          <li>🤖 <span>La IA clasifica cada reporte y calcula el riesgo de la zona.</span></li>
-        </ul>
+        <div className="show-cards">
+          <div className="float-card a">
+            <span className="tile-icon hot-dot"><Icon name="alert" size={18} /></span>
+            <div>
+              <b>Robo reportado</b>
+              <small>Centro · hace 3 min</small>
+            </div>
+          </div>
+          <div className="float-card b">
+            <span className="tile-icon ai-dot"><Icon name="sparkles" size={18} /></span>
+            <div>
+              <b>“Evita la Calle 18 después de las 9 p. m.”</b>
+              <small>Asistente IA</small>
+            </div>
+          </div>
+          <div className="float-card c">
+            <span className="tile-icon ok-dot"><Icon name="check" size={18} /></span>
+            <div>
+              <b>Alerta verificada</b>
+              <small>2 vecinos confirmaron</small>
+            </div>
+          </div>
+        </div>
       </aside>
-      <section className="auth-box">{children}</section>
+    </div>
+  );
+}
+
+function Field({ icon, children }: { icon: IconName; children: ReactNode }) {
+  return (
+    <div className="field">
+      <Icon name={icon} size={18} className="field-icon" />
+      {children}
     </div>
   );
 }
@@ -36,25 +70,29 @@ function PasswordInput({
   value,
   onChange,
   autoComplete,
+  placeholder = "Contraseña",
 }: {
   value: string;
   onChange: (v: string) => void;
   autoComplete: string;
+  placeholder?: string;
 }) {
   const [show, setShow] = useState(false);
   return (
-    <div className="input-wrap">
+    <Field icon="lock">
       <input
         type={show ? "text" : "password"}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         autoComplete={autoComplete}
+        placeholder={placeholder}
+        aria-label={placeholder}
         required
       />
-      <button type="button" onClick={() => setShow(!show)} aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}>
-        {show ? "Ocultar" : "Ver"}
+      <button type="button" className="field-toggle" onClick={() => setShow(!show)} aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}>
+        <Icon name={show ? "eyeOff" : "eye"} size={18} />
       </button>
-    </div>
+    </Field>
   );
 }
 
@@ -103,41 +141,37 @@ export function Login() {
 
   return (
     <AuthLayout>
-      <h2>Iniciar sesión</h2>
-      <p className="muted">Bienvenido de nuevo.</p>
-      <form onSubmit={submit} className="form">
-        <label>
-          Correo
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
-        </label>
-        <label>
-          Contraseña
-          <PasswordInput value={password} onChange={setPassword} autoComplete="current-password" />
-        </label>
+      <h1 className="auth-title">Bienvenido de nuevo</h1>
+      <p className="muted">Inicia sesión para ver las alertas de tu barrio.</p>
+      <form onSubmit={submit} className="form auth-fields">
+        <Field icon="mail">
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="Correo electrónico" aria-label="Correo" required />
+        </Field>
+        <PasswordInput value={password} onChange={setPassword} autoComplete="current-password" />
         <ErrorBox message={error} />
-        <button className="btn" disabled={busy}>
-          {busy ? "Entrando…" : "Entrar"}
+        <button className="btn block big" disabled={busy}>
+          {busy ? "Entrando…" : "Iniciar sesión"}
         </button>
       </form>
-      <p className="muted">
-        ¿No tienes cuenta? <Link to="/registro">Regístrate</Link>
-      </p>
-      <div className="demo">
-        <small className="muted">Cuentas de prueba (contraseña Alerta2026*):</small>
+      <div className="divider"><span>o entra con una cuenta de prueba</span></div>
+      <div className="demo-row">
         {DEMO_USERS.map(([mail, label]) => (
           <button
             key={mail}
-            className="btn small ghost"
+            className="btn ghost"
             type="button"
             onClick={() => {
               setEmail(mail);
               setPassword("Alerta2026*");
             }}
           >
-            {label}
+            <Icon name={mail.startsWith("moderador") ? "shield" : "user"} size={16} /> {label}
           </button>
         ))}
       </div>
+      <p className="auth-switch">
+        ¿No tienes cuenta? <Link to="/registro">Regístrate gratis</Link>
+      </p>
     </AuthLayout>
   );
 }
@@ -179,48 +213,35 @@ export function Register() {
 
   return (
     <AuthLayout>
-      <h2>Crear cuenta</h2>
-      <p className="muted">Te toma menos de un minuto.</p>
-      <form onSubmit={submit} className="form">
-        <label>
-          Nombre completo
-          <input value={form.full_name} onChange={set("full_name")} autoComplete="name" required minLength={3} />
-        </label>
-        <label>
-          Correo
-          <input type="email" value={form.email} onChange={set("email")} autoComplete="email" required />
-        </label>
-        <label>
-          Contraseña
-          <PasswordInput value={form.password} onChange={(v) => setForm({ ...form, password: v })} autoComplete="new-password" />
-        </label>
-        <PasswordStrength password={form.password} />
-        <label>
-          Repetir contraseña
-          <PasswordInput value={form.confirm} onChange={(v) => setForm({ ...form, confirm: v })} autoComplete="new-password" />
-          {form.confirm && !matches && <small style={{ color: "var(--primary)" }}>No coinciden</small>}
-        </label>
-        <label>
-          Teléfono (opcional)
-          <input value={form.phone} onChange={set("phone")} autoComplete="tel" />
-        </label>
-        <label>
-          Mi barrio (te suscribimos a sus alertas)
-          <select value={form.neighborhood_id} onChange={set("neighborhood_id")}>
-            <option value="">— Elegir —</option>
+      <h1 className="auth-title">Crea tu cuenta</h1>
+      <p className="muted">Únete a los vecinos que cuidan {CITY_NAME}.</p>
+      <form onSubmit={submit} className="form auth-fields">
+        <Field icon="user">
+          <input value={form.full_name} onChange={set("full_name")} autoComplete="name" placeholder="Nombre completo" aria-label="Nombre completo" required minLength={3} />
+        </Field>
+        <Field icon="mail">
+          <input type="email" value={form.email} onChange={set("email")} autoComplete="email" placeholder="Correo electrónico" aria-label="Correo" required />
+        </Field>
+        <PasswordInput value={form.password} onChange={(v) => setForm({ ...form, password: v })} autoComplete="new-password" />
+        {form.password && <PasswordStrength password={form.password} />}
+        <PasswordInput value={form.confirm} onChange={(v) => setForm({ ...form, confirm: v })} autoComplete="new-password" placeholder="Repite la contraseña" />
+        {form.confirm && !matches && <small style={{ color: "var(--primary)" }}>Las contraseñas no coinciden</small>}
+        <Field icon="pin">
+          <select value={form.neighborhood_id} onChange={set("neighborhood_id")} aria-label="Mi barrio">
+            <option value="">Mi barrio (opcional)</option>
             {neighborhoods.data?.map((n) => (
               <option key={n.id} value={n.id}>
                 {n.name}
               </option>
             ))}
           </select>
-        </label>
+        </Field>
         <ErrorBox message={error} />
-        <button className="btn" disabled={busy || !strong || !matches}>
-          {busy ? "Creando…" : "Registrarme"}
+        <button className="btn block big" disabled={busy || !strong || !matches}>
+          {busy ? "Creando…" : "Crear cuenta"}
         </button>
       </form>
-      <p className="muted">
+      <p className="auth-switch">
         ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
       </p>
     </AuthLayout>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Circle } from "react-leaflet";
 import { api } from "../api/client";
+import AssistantChat from "../components/Assistant";
 import BaseMap from "../components/BaseMap";
 import { Card, DSTag, ErrorBox, Loading } from "../components/ui";
 import { DAYS, HOUR_BLOCKS, heatRadius, pct } from "../lib/format";
@@ -26,18 +27,14 @@ export default function AIPage() {
 
   return (
     <div className="stack-l">
-      <div>
-        <h2>Inteligencia artificial</h2>
-        <p className="muted">
-          Componente separado del backend. Modelos activos:{" "}
-          {status.data?.available ? (
-            <code>
-              {String(status.data.classifier)} · {String(status.data.heatmap)} · {String(status.data.summary)}
-            </code>
-          ) : (
-            <span className="dot red">IA no disponible</span>
-          )}
-        </p>
+      <AssistantChat />
+
+      <div className="toolbar left">
+        {status.data?.available ? (
+          <span className="pill-ai">● IA en línea · {String(status.data.summary)}</span>
+        ) : (
+          <span className="badge status-rejected">IA sin conexión</span>
+        )}
       </div>
 
       <Card title="Mapa de calor predictivo" actions={<small className="muted">{heat.data?.model}</small>}>

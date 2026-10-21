@@ -1,92 +1,97 @@
-import type { ReactNode } from "react";
 import { CircleMarker, Popup } from "react-leaflet";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
-import type { DashboardStats, RankingRow, Report } from "../api/types";
+import type { DashboardStats, Heatmap, RankingRow, Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import BaseMap from "../components/BaseMap";
-import { Card, StatusBadge } from "../components/ui";
-import { CITY_NAME, greeting, longDate, timeAgo } from "../lib/format";
+import Icon, { type IconName } from "../components/Icon";
+import { CITY_NAME, DAYS, greeting, longDate, timeAgo } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
-
-const TEAM = (import.meta.env.VITE_TEAM_MEMBERS ?? "Integrante 1,Integrante 2").split(",").map((s: string) => s.trim());
-
-const STRUCTURES = [
-  ["Cola de prioridad (heap)", "Los reportes nuevos se moderan por gravedad: un robo armado antes que una sospecha."],
-  ["Pila", "Historial de estados de cada reporte. Permite deshacer una publicación errónea."],
-  ["Lista enlazada", "Feed de alertas activas por barrio y lista de vecinos suscritos."],
-  ["Cola (FIFO)", "Notificaciones pendientes que se despachan en orden de llegada."],
-  ["Tabla hash", "Acceso O(1) al feed, suscriptores y pila de cada barrio o reporte."],
-  ["Árbol AVL", "Historial de reportes por fecha para consultas por rango."],
-  ["Grafo + Dijkstra", "Barrios conectados para sugerir la ruta más segura."],
-  ["Merge / Quick sort, búsqueda binaria", "Feed general, ranking de barrios y búsqueda en el catálogo."],
-];
 
 export default function Home() {
   const { user } = useAuth();
-  const hello = useAsync(() => api.hello(), []);
   const stats = useAsync(() => api.stats(), []);
-  const ai = useAsync(() => api.aiStatus(), []);
   const ranking = useAsync(() => api.ranking(), []);
   const feed = useAsync(() => api.feed(), []);
-  const summaryHood = user?.neighborhood?.id ?? 1;
-  const summary = useAsync(() => api.dailySummary(summaryHood), [summaryHood]);
-
-  const aiUp = ai.data?.available === true;
+  const heat = useAsync(() => api.heatmap(), []);
+  const ai = useAsync(() => api.aiStatus(), []);
+  const hood = user?.neighborhood?.id ?? 1;
+  const summary = useAsync(() => api.dailySummary(hood), [hood]);
   const s = stats.data;
+  const change = s && s.last_week ? Math.round(((s.this_week - s.last_week) / s.last_week) * 100) : null;
 
   return (
-    <div className="stack-l">
-      <section className="dash-hero">
+    <div className="dash">
+      <div className="dash-welcome">
         <div>
-          <p className="eyebrow">
-            {longDate()} · {CITY_NAME}, Nariño
-          </p>
-          <h1>
+          <h2>
             {greeting()}
-            {user ? `, ${user.full_name.split(" ")[0]}` : ""}
-          </h1>
-          <p>
-            Así está la seguridad en los barrios de {CITY_NAME} hoy: alertas verificadas por los vecinos, priorizadas por
-            gravedad y analizadas por la inteligencia artificial.
+            {user ? `, ${user.full_name.split(" ")[0]}` : ""} 👋
+          </h2>
+          <p className="muted">
+            {longDate()} · {CITY_NAME}
           </p>
-          <div className="services">
-            <Service label="Backend" up={hello.data ? true : hello.error ? false : undefined} />
-            <Service label="Base de datos" up={s ? true : stats.error ? false : undefined} />
-            <Service label={aiUp ? `IA · ${String(ai.data?.classifier ?? "")}` : "IA"} up={ai.data ? aiUp : ai.error ? false : undefined} />
+        </div>
+        <span className={`live ${ai.data?.available ? "on" : ""}`}>
+          <i /> {ai.data?.available ? "IA en línea" : ai.data ? "IA sin conexión" : "Conectando…"}
+        </span>
+      </div>
+
+      {stats.error && <div className="alert-error">No hay conexión con el servidor. Si estaba dormido tarda un minuto; recarga en un momento.</div>}
+
+      <div className="dash-top">
+        <div className="tiles">
+          <Tile tone="hot" icon="alert" title="Alertas activas" value={s?.active_alerts} sub={s ? `${s.by_status.verified} verificadas` : ""} to="/feed" />
+          <Tile icon="shield" title="Por moderar" value={s?.pending_moderation} sub="en la cola" to="/moderacion" tint="#f59e0b" />
+          <Tile
+            icon="chart"
+            title="Esta semana"
+            value={s?.this_week}
+            sub={change === null ? "reportes" : `${change > 0 ? "▲" : "▼"} ${Math.abs(change)}% vs. anterior`}
+            tint="#6366f1"
+            to="/ia"
+          />
+        </div>
+        <section className="panel stat-panel">
+          <div className="panel-head">
+            <h3>Estado de reportes</h3>
+            <span className="tag">Total {s?.total_reports ?? "—"}</span>
           </div>
+          {s ? <StatusRing stats={s} /> : <Skeleton lines={4} />}
+        </section>
+      </div>
+
+      <section>
+        <div className="panel-head">
+          <h3>Alertas recientes</h3>
+          <Link to="/feed" className="tag link">Ver todas</Link>
         </div>
-        <div className="row gap-s wrap">
-          <Link className="btn" to={user ? "/reportar" : "/registro"}>
-            {user ? "＋ Reportar incidente" : "Crear cuenta"}
-          </Link>
-          <Link className="btn ghost" to="/mapa">
-            Ver mapa en vivo
-          </Link>
-        </div>
+        {feed.data ? <RecentCards reports={latest(feed.data)} /> : <Skeleton lines={3} />}
       </section>
 
-      {hello.error && (
-        <div className="alert-error">
-          No hay conexión con el backend ({hello.error}). Si está en el plan gratis de Render puede tardar un minuto en
-          despertar; recarga la página en un momento.
-        </div>
-      )}
-
-      <Kpis stats={s} ranking={ranking.data} />
-
       <div className="dash-grid">
-        <Card title="Reportes de los últimos 14 días" actions={<small className="muted">por fecha del incidente</small>}>
-          {s ? <Bars data={s.timeline} /> : <Skeleton lines={5} />}
-        </Card>
-        <Card title="Por tipo de incidente" actions={<small className="muted">14 días</small>}>
-          {s ? <Donut data={s.by_type} /> : <Skeleton lines={5} />}
-        </Card>
+        <section className="panel">
+          <div className="panel-head">
+            <h3>Horario de riesgo</h3>
+            <span className="tag">Predicción IA</span>
+          </div>
+          {heat.data ? <RiskSchedule heat={heat.data} /> : <Skeleton lines={5} />}
+        </section>
+        <section className="panel">
+          <div className="panel-head">
+            <h3>Barrios con más alertas</h3>
+          </div>
+          {ranking.data ? <TopHoods rows={ranking.data} /> : <Skeleton lines={4} />}
+        </section>
       </div>
 
       <div className="dash-grid">
-        <Card title="Alertas en el mapa" actions={<Link to="/mapa" className="btn small ghost">Abrir mapa</Link>}>
-          <BaseMap height={340} zoom={13}>
+        <section className="panel">
+          <div className="panel-head">
+            <h3>Mapa</h3>
+            <Link to="/mapa" className="tag link">Abrir</Link>
+          </div>
+          <BaseMap height={300} zoom={13}>
             {feed.data?.slice(0, 40).map((r) => (
               <CircleMarker
                 key={r.id}
@@ -97,269 +102,220 @@ export default function Home() {
                 <Popup>
                   <b>{r.title}</b>
                   <br />
-                  {r.incident_type.name} · {r.neighborhood.name}
+                  {r.neighborhood.name}
                 </Popup>
               </CircleMarker>
             ))}
           </BaseMap>
-        </Card>
-        <Card title="Últimas alertas" actions={<Link to="/feed" className="btn small ghost">Ver todas</Link>}>
-          {feed.data ? <AlertList reports={latest(feed.data)} /> : <Skeleton lines={6} />}
-        </Card>
-      </div>
-
-      <div className="dash-grid even">
-        <section className="card ai-card">
-          <header className="card-head">
-            <h3>Resumen del día · {summary.data?.neighborhood.name ?? "…"}</h3>
-            <span className="pill-ai">🤖 IA</span>
-          </header>
-          {summary.loading ? (
-            <Skeleton lines={4} />
-          ) : summary.data ? (
-            <>
-              <p className="summary">{summary.data.summary_text}</p>
-              <small className="muted">Modelo: {summary.data.model}</small>
-            </>
-          ) : (
-            <p className="muted">El resumen no está disponible ahora.</p>
-          )}
-          <div className="row gap-s wrap" style={{ marginTop: 12 }}>
-            <Link to="/ia" className="btn small dark">
-              Mapa de calor e insights
-            </Link>
-            {!aiUp && ai.data && (
-              <small className="muted">El componente de IA no responde: el resumen sale con la plantilla de respaldo.</small>
-            )}
-          </div>
         </section>
-        <Card title="Barrios con más alertas activas" actions={<small className="muted">quick sort</small>}>
-          {ranking.data ? <RankingBars rows={ranking.data} /> : <Skeleton lines={6} />}
-        </Card>
+        <section className="panel ai-panel">
+          <div className="panel-head">
+            <h3>
+              <Icon name="sparkles" size={16} /> Resumen de hoy
+            </h3>
+            <span className="tag">{summary.data?.neighborhood.name ?? "…"}</span>
+          </div>
+          {summary.loading ? <Skeleton lines={4} /> : <p className="summary">{summary.data?.summary_text ?? "No disponible ahora."}</p>}
+          {s && <MiniBars data={s.timeline} />}
+        </section>
       </div>
-
-      <section>
-        <div className="section-title">
-          <h2>Sobre el proyecto</h2>
-          <Link to="/estructuras">Ver estructuras en vivo →</Link>
-        </div>
-        <div className="dash-grid">
-          <div className="grid-cards">
-            {STRUCTURES.map(([t, d]) => (
-              <div className="card mini" key={t}>
-                <h4>{t}</h4>
-                <p className="muted">{d}</p>
-              </div>
-            ))}
-          </div>
-          <div className="stack-m">
-            <div className="card team">
-              <h3>Integrantes</h3>
-              <ul>
-                {TEAM.map((m: string) => (
-                  <li key={m}>{m}</li>
-                ))}
-              </ul>
-              <small className="muted">{hello.data?.message ?? "Conectando con el backend…"}</small>
-            </div>
-            <div className="card mini">
-              <h4>Ciclo completo</h4>
-              <div className="flow">
-                {["Vecino", "Frontend", "Backend", "Base de datos", "IA", "Backend", "Vecinos"].map((step, i) => (
-                  <span key={i} className="flow-step">
-                    {step}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
 
 // ---------------------------------------------------------------- piezas
 
-function Service({ label, up }: { label: string; up?: boolean }) {
+function Tile({
+  icon,
+  title,
+  value,
+  sub,
+  tone,
+  tint = "#e11d48",
+  to,
+}: {
+  icon: IconName;
+  title: string;
+  value?: number;
+  sub: string;
+  tone?: "hot";
+  tint?: string;
+  to: string;
+}) {
   return (
-    <span className={`service ${up === true ? "up" : up === false ? "down" : ""}`}>
-      <i /> {label} {up === undefined ? "· conectando" : up ? "· en línea" : "· sin conexión"}
-    </span>
+    <Link to={to} className={`tile ${tone ?? ""}`}>
+      <span className="tile-icon" style={tone ? undefined : { background: `${tint}17`, color: tint }}>
+        <Icon name={icon} size={22} />
+      </span>
+      <span className="tile-text">
+        <b>{value ?? "—"}</b>
+        <span>{title}</span>
+        <small>{sub}</small>
+      </span>
+    </Link>
   );
 }
 
-function Kpi({ label, value, foot, icon, tint, text }: { label: string; value: ReactNode; foot?: ReactNode; icon: string; tint: string; text?: boolean }) {
+function StatusRing({ stats }: { stats: DashboardStats }) {
+  const rings = [
+    { label: "Verificados", value: stats.by_status.verified, color: "#e11d48" },
+    { label: "Publicados", value: stats.by_status.published, color: "#3b82f6" },
+    { label: "En moderación", value: stats.by_status.created + stats.by_status.in_review, color: "#a855f7" },
+  ];
+  const total = Math.max(1, stats.total_reports);
   return (
-    <div className="kpi">
-      <div className="kpi-top">
-        <span className="kpi-label">{label}</span>
-        <span className="kpi-icon" style={{ background: `${tint}18`, color: tint }}>
-          {icon}
-        </span>
-      </div>
-      <div className={`kpi-value ${text ? "text" : ""}`}>{value}</div>
-      {foot && <div className="kpi-foot">{foot}</div>}
-    </div>
-  );
-}
-
-function Kpis({ stats, ranking }: { stats: DashboardStats | null; ranking: RankingRow[] | null }) {
-  const change = stats && stats.last_week ? Math.round(((stats.this_week - stats.last_week) / stats.last_week) * 100) : null;
-  const top = ranking?.[0];
-  return (
-    <div className="kpis">
-      <Kpi
-        label="Alertas activas"
-        icon="🚨"
-        tint="#e11d48"
-        value={stats?.active_alerts ?? "—"}
-        foot={stats ? `${stats.by_status.verified} verificadas por vecinos` : " "}
-      />
-      <Kpi
-        label="Por moderar"
-        icon="🛡️"
-        tint="#d97706"
-        value={stats?.pending_moderation ?? "—"}
-        foot="en la cola de prioridad (heap)"
-      />
-      <Kpi
-        label="Reportes esta semana"
-        icon="📈"
-        tint="#4f46e5"
-        value={stats?.this_week ?? "—"}
-        foot={
-          change === null ? (
-            "últimos 7 días"
-          ) : (
-            <>
-              <span className={change > 0 ? "trend-up" : "trend-down"}>
-                {change > 0 ? "▲" : "▼"} {Math.abs(change)}%
-              </span>{" "}
-              vs. semana anterior
-            </>
-          )
-        }
-      />
-      <Kpi
-        label="Barrio más afectado"
-        icon="📍"
-        tint="#0f172a"
-        text
-        value={top?.neighborhood ?? "—"}
-        foot={top ? `${top.active_alerts} alertas · gravedad ${top.active_severity}` : " "}
-      />
-    </div>
-  );
-}
-
-function Bars({ data }: { data: { date: string; count: number }[] }) {
-  const max = Math.max(1, ...data.map((d) => d.count));
-  return (
-    <div className="bars">
-      {data.map((d, i) => {
-        const day = new Date(`${d.date}T12:00:00`);
-        return (
-          <div className="bar" key={d.date} title={`${d.count} reportes`}>
-            <b>{d.count || ""}</b>
-            <span className={i === data.length - 1 ? "today" : ""} style={{ height: `${(d.count / max) * 100}%` }} />
-            <small>{day.toLocaleDateString("es-CO", { weekday: "narrow" })}</small>
+    <div className="ring-wrap">
+      <div className="ring-legend">
+        {rings.map((r) => (
+          <div key={r.label}>
+            <b>
+              {r.value}/{stats.total_reports}
+            </b>
+            <span style={{ borderColor: r.color }}>{r.label}</span>
           </div>
+        ))}
+      </div>
+      <svg viewBox="0 0 120 120" width={150} height={150} role="img" aria-label="Estado de los reportes">
+        {rings.map((r, i) => {
+          const radius = 50 - i * 12;
+          const c = 2 * Math.PI * radius;
+          const len = (r.value / total) * c;
+          return (
+            <g key={r.label}>
+              <circle cx="60" cy="60" r={radius} fill="none" stroke="#eef1f6" strokeWidth="8" />
+              <circle
+                cx="60"
+                cy="60"
+                r={radius}
+                fill="none"
+                stroke={r.color}
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={`${len} ${c}`}
+                transform="rotate(-90 60 60)"
+              />
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+function latest(reports: Report[]): Report[] {
+  return [...reports].sort((a, b) => b.occurred_at.localeCompare(a.occurred_at)).slice(0, 3);
+}
+
+function RecentCards({ reports }: { reports: Report[] }) {
+  if (!reports.length) return <p className="muted">No hay alertas activas 🎉</p>;
+  return (
+    <div className="recent">
+      {reports.map((r) => {
+        const confirmations = r.confirmations ?? (r.status === "verified" ? 2 : 0);
+        const progress = Math.min(100, (confirmations / 2) * 100);
+        return (
+          <Link to="/feed" key={r.id} className="recent-card">
+            <div className="recent-top">
+              <span className="recent-icon" style={{ background: `${r.incident_type.color}1c`, color: r.incident_type.color }}>
+                <Icon name="alert" size={20} />
+              </span>
+              <div>
+                <b>{r.title}</b>
+                <small>
+                  <Icon name="pin" size={12} /> {r.neighborhood.name} · {timeAgo(r.occurred_at)}
+                </small>
+              </div>
+            </div>
+            <div className="progress">
+              <span style={{ width: `${progress}%`, background: r.incident_type.color }} />
+            </div>
+            <div className="recent-foot">
+              <span>{confirmations >= 2 ? "Verificada" : `${confirmations}/2 confirmaciones`}</span>
+              <span className="tag" style={{ color: r.incident_type.color }}>
+                {r.incident_type.name}
+              </span>
+            </div>
+          </Link>
         );
       })}
     </div>
   );
 }
 
-function Donut({ data }: { data: DashboardStats["by_type"] }) {
-  const total = data.reduce((a, d) => a + d.count, 0);
-  if (!total) return <p className="muted">Sin reportes en estos días.</p>;
-  const r = 52;
-  const c = 2 * Math.PI * r;
-  let offset = 0;
-  return (
-    <div className="donut-wrap">
-      <svg viewBox="0 0 140 140" width={150} height={150} role="img" aria-label="Reportes por tipo">
-        <circle cx="70" cy="70" r={r} fill="none" stroke="#eef1f6" strokeWidth="18" />
-        {data.map((d) => {
-          const len = (d.count / total) * c;
-          const el = (
-            <circle
-              key={d.code}
-              cx="70"
-              cy="70"
-              r={r}
-              fill="none"
-              stroke={d.color}
-              strokeWidth="18"
-              strokeDasharray={`${len} ${c - len}`}
-              strokeDashoffset={-offset}
-              transform="rotate(-90 70 70)"
-            />
-          );
-          offset += len;
-          return el;
-        })}
-        <text x="70" y="68" textAnchor="middle" fontSize="24" fontWeight="800" fill="#0b1220">
-          {total}
-        </text>
-        <text x="70" y="86" textAnchor="middle" fontSize="10" fill="#64748b">
-          reportes
-        </text>
-      </svg>
-      <ul className="donut-legend">
-        {data.slice(0, 6).map((d) => (
-          <li key={d.code}>
-            <i style={{ background: d.color }} /> {d.name} <b>{d.count}</b>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+const BLOCK_COLORS = ["#a855f7", "#3b82f6", "#f59e0b", "#e11d48"];
+const BLOCK_LABELS = ["Madrugada", "Mañana", "Tarde", "Noche"];
 
-function RankingBars({ rows }: { rows: RankingRow[] }) {
-  const list = rows.filter((r) => r.active_alerts > 0).slice(0, 7);
-  if (!list.length) return <p className="muted">No hay alertas activas. 🎉</p>;
-  const max = Math.max(...list.map((r) => r.active_severity), 1);
+function RiskSchedule({ heat }: { heat: Heatmap }) {
+  // Un renglon por barrio (los 4 mas riesgosos) y una barra por cada franja horaria caliente
+  const hoods = heat.neighborhood_risk.slice(0, 4);
+  if (!hoods.length) return <p className="muted">Aún no hay suficiente historial.</p>;
   return (
-    <div className="hbars">
-      {list.map((r) => (
-        <div className="hbar" key={r.neighborhood_id} title={`Gravedad acumulada ${r.active_severity}`}>
-          <span className="name">{r.neighborhood}</span>
-          <div className="track">
-            <span style={{ width: `${(r.active_severity / max) * 100}%` }} />
+    <div className="schedule">
+      {hoods.map((h) => {
+        const spots = heat.hotspots.filter((x) => x.neighborhood_id === h.neighborhood_id).slice(0, 3);
+        return (
+          <div className="sched-row" key={h.neighborhood_id}>
+            <span className="sched-name">{h.neighborhood_name}</span>
+            <div className="sched-track">
+              {spots.map((x, i) => (
+                <span
+                  key={i}
+                  className="sched-bar"
+                  title={`${DAYS[x.day_of_week]} · ${BLOCK_LABELS[x.hour_block]} · ${Math.round(x.risk_score * 100)}%`}
+                  style={{
+                    left: `${x.hour_block * 25 + 1}%`,
+                    width: "23%",
+                    top: `${i * 30}%`,
+                    background: BLOCK_COLORS[x.hour_block],
+                    opacity: 0.55 + x.risk_score * 0.45,
+                  }}
+                >
+                  {DAYS[x.day_of_week].slice(0, 3)} · {Math.round(x.risk_score * 100)}%
+                </span>
+              ))}
+            </div>
           </div>
-          <b>{r.active_alerts}</b>
+        );
+      })}
+      <div className="sched-axis">
+        <span />
+        <div>
+          {["0:00", "6:00", "12:00", "18:00", "24:00"].map((t) => (
+            <small key={t}>{t}</small>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   );
 }
 
-function latest(reports: Report[]): Report[] {
-  return [...reports].sort((a, b) => b.occurred_at.localeCompare(a.occurred_at)).slice(0, 6);
-}
-
-function AlertList({ reports }: { reports: Report[] }) {
-  if (!reports.length) return <p className="muted">No hay alertas activas. 🎉</p>;
+function TopHoods({ rows }: { rows: RankingRow[] }) {
+  const list = rows.filter((r) => r.active_alerts > 0).slice(0, 5);
+  if (!list.length) return <p className="muted">No hay alertas activas 🎉</p>;
   return (
-    <ul className="alert-list">
-      {reports.map((r) => (
-        <li key={r.id}>
-          <span className="sev" style={{ background: `${r.incident_type.color}1a`, color: r.incident_type.color }}>
-            {r.incident_type.severity_level}
+    <ol className="top-hoods">
+      {list.map((r, i) => (
+        <li key={r.neighborhood_id}>
+          <span className="rank">{i + 1}</span>
+          <span className="name">
+            <b>{r.neighborhood}</b>
+            <small>{r.subscribers} vecinos suscritos</small>
           </span>
-          <div className="body">
-            <b>{r.title}</b>
-            <small>
-              {r.incident_type.name} · {r.neighborhood.name} · {timeAgo(r.occurred_at)}
-            </small>
-          </div>
-          <StatusBadge status={r.status} />
+          <span className="value">{r.active_alerts}</span>
         </li>
       ))}
-    </ul>
+    </ol>
+  );
+}
+
+function MiniBars({ data }: { data: { date: string; count: number }[] }) {
+  const max = Math.max(1, ...data.map((d) => d.count));
+  return (
+    <div className="minibars" title="Reportes por día (14 días)">
+      {data.map((d, i) => (
+        <span key={d.date} className={i === data.length - 1 ? "today" : ""} style={{ height: `${10 + (d.count / max) * 90}%` }} />
+      ))}
+    </div>
   );
 }
 

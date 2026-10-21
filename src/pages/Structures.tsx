@@ -30,8 +30,7 @@ export default function Structures() {
 
   return (
     <div className="stack-l">
-      <div className="row space">
-        <h2>Estructuras de datos en vivo</h2>
+      <div className="toolbar">
         <button className="btn ghost" onClick={state.reload}>Actualizar</button>
       </div>
       {!s ? (

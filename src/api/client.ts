@@ -118,6 +118,8 @@ export const api = {
   // IA
   aiStatus: () => request<Record<string, unknown>>("/api/v1/ai/status"),
   heatmap: (days = 120) => request<Heatmap>(`/api/v1/ai/heatmap${qs({ days })}`),
+  chat: (question: string, neighborhoodId?: number | null) =>
+    post<{ available: boolean; answer: string; model: string }>("/api/v1/ai/chat", { question, neighborhood_id: neighborhoodId ?? null }),
   dailySummary: (neighborhoodId: number, refresh = false) =>
     request<DailySummary>(`/api/v1/ai/daily-summary${qs({ neighborhood_id: neighborhoodId, refresh })}`),
 

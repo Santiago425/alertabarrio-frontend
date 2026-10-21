@@ -1,6 +1,11 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { Link, Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { api } from "./api/client";
 import { useAuth } from "./auth/AuthContext";
+import { AssistantFab } from "./components/Assistant";
+import Icon, { type IconName } from "./components/Icon";
+import { CITY_NAME } from "./lib/format";
+import { useAsync } from "./lib/useAsync";
 import AIPage from "./pages/AIPage";
 import { Account, Login, Register } from "./pages/Auth";
 import Feed, { MyReports } from "./pages/Feed";
@@ -11,7 +16,20 @@ import NewReport from "./pages/NewReport";
 import Notifications from "./pages/Notifications";
 import RoutePage from "./pages/RoutePage";
 import Structures from "./pages/Structures";
-import { CITY_NAME } from "./lib/format";
+
+const TITLES: Record<string, string> = {
+  "/": "Panel",
+  "/mapa": "Mapa en vivo",
+  "/feed": "Alertas",
+  "/reportar": "Reportar incidente",
+  "/ia": "Inteligencia artificial",
+  "/rutas": "Ruta segura",
+  "/moderacion": "Moderación",
+  "/estructuras": "Estructuras de datos",
+  "/notificaciones": "Notificaciones",
+  "/mis-reportes": "Mis reportes",
+  "/cuenta": "Mi cuenta",
+};
 
 function Private({ children, moderator = false }: { children: ReactNode; moderator?: boolean }) {
   const { user, loading, isModerator } = useAuth();
@@ -21,74 +39,143 @@ function Private({ children, moderator = false }: { children: ReactNode; moderat
   return <>{children}</>;
 }
 
+function NavItem({ to, icon, label, end }: { to: string; icon: IconName; label: string; end?: boolean }) {
+  return (
+    <NavLink to={to} end={end} className="side-link">
+      <Icon name={icon} />
+      <span>{label}</span>
+    </NavLink>
+  );
+}
+
 export default function App() {
+  const location = useLocation();
+  const isAuth = location.pathname === "/login" || location.pathname === "/registro";
+
+  if (isAuth) {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Register />} />
+      </Routes>
+    );
+  }
+  return <Shell />;
+}
+
+function Shell() {
   const { user, isModerator, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const location = useLocation();
   useEffect(() => setOpen(false), [location.pathname]);
+
+  const notes = useAsync(() => (user ? api.notifications() : Promise.resolve([])), [user?.id, location.pathname]);
+  const subs = useAsync(() => (user ? api.mySubscriptions() : Promise.resolve([])), [user?.id]);
+  const unread = notes.data?.filter((n) => !n.is_read).length ?? 0;
   const initials = user?.full_name.split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
+  const title = TITLES[location.pathname] ?? "AlertaBarrio";
 
   return (
-    <>
-      <header className={`topbar ${open ? "open" : ""}`}>
-        <NavLink to="/" className="brand">
-          <img src="/favicon.svg" alt="" width={30} height={30} />
+    <div className={`shell ${open ? "menu-open" : ""}`}>
+      <aside className="sidebar">
+        <Link to="/" className="side-brand">
+          <img src="/favicon.svg" alt="" width={32} height={32} />
           <span>
             AlertaBarrio
             <small>{CITY_NAME}, Nariño</small>
           </span>
-        </NavLink>
-        <button className="menu-btn" aria-label="Abrir menú" aria-expanded={open} onClick={() => setOpen(!open)}>
-          {open ? "✕" : "☰"}
-        </button>
-        <nav>
-          <NavLink to="/" end>Panel</NavLink>
-          <NavLink to="/mapa">Mapa</NavLink>
-          <NavLink to="/feed">Alertas</NavLink>
-          {user && <NavLink to="/reportar">Reportar</NavLink>}
-          <NavLink to="/ia">IA</NavLink>
-          <NavLink to="/rutas">Ruta segura</NavLink>
-          {isModerator && <NavLink to="/moderacion">Moderación</NavLink>}
-          <NavLink to="/estructuras">Estructuras</NavLink>
+        </Link>
+
+        <nav className="side-nav">
+          <NavItem to="/" end icon="home" label="Panel" />
+          <NavItem to="/mapa" icon="map" label="Mapa en vivo" />
+          <NavItem to="/feed" icon="alert" label="Alertas" />
+          {user && <NavItem to="/reportar" icon="plus" label="Reportar" />}
+          <NavItem to="/ia" icon="sparkles" label="Inteligencia artificial" />
+          <NavItem to="/rutas" icon="route" label="Ruta segura" />
+          {isModerator && <NavItem to="/moderacion" icon="shield" label="Moderación" />}
+          <NavItem to="/estructuras" icon="layers" label="Estructuras" />
         </nav>
-        <div className="user">
+
+        {user && !!subs.data?.length && (
+          <div className="side-section">
+            <p className="side-title">Mis barrios</p>
+            {subs.data.slice(0, 5).map((s, i) => (
+              <Link key={s.neighborhood.id} to="/feed" className="side-hood">
+                <i style={{ background: ["#fb7185", "#60a5fa", "#a78bfa", "#fbbf24", "#34d399"][i % 5] }} />
+                {s.neighborhood.name}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        <div className="side-bottom">
           {user ? (
             <>
-              <NavLink to="/notificaciones" className="icon" title="Notificaciones">🔔</NavLink>
-              <NavLink to="/mis-reportes" title="Mis reportes" className="row gap-s">
-                <span className="avatar">{initials}</span>
-                <span>{user.full_name.split(" ")[0]}</span>
-              </NavLink>
-              <NavLink to="/cuenta" title="Seguridad de la cuenta">🔒</NavLink>
-              <button className="btn small ghost" onClick={signOut}>Salir</button>
+              <NavItem to="/cuenta" icon="lock" label="Mi cuenta" />
+              <button className="side-link" onClick={signOut}>
+                <Icon name="logout" />
+                <span>Cerrar sesión</span>
+              </button>
             </>
           ) : (
             <>
-              <NavLink to="/login">Entrar</NavLink>
-              <NavLink to="/registro" className="btn small">Registrarse</NavLink>
+              <Link to="/login" className="btn block">Iniciar sesión</Link>
+              <Link to="/registro" className="side-link center">Crear cuenta</Link>
             </>
           )}
         </div>
-      </header>
-      <main className="container">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<Register />} />
-          <Route path="/mapa" element={<MapPage />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/ia" element={<AIPage />} />
-          <Route path="/rutas" element={<RoutePage />} />
-          <Route path="/estructuras" element={<Structures />} />
-          <Route path="/reportar" element={<Private><NewReport /></Private>} />
-          <Route path="/mis-reportes" element={<Private><MyReports /></Private>} />
-          <Route path="/cuenta" element={<Private><Account /></Private>} />
-          <Route path="/notificaciones" element={<Private><Notifications /></Private>} />
-          <Route path="/moderacion" element={<Private moderator><Moderation /></Private>} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-      <footer className="footer muted">AlertaBarrio · {CITY_NAME}, Nariño · Proyecto final de Estructuras de Datos</footer>
-    </>
+      </aside>
+      <div className="backdrop" onClick={() => setOpen(false)} />
+
+      <div className="main">
+        <header className="header">
+          <button className="icon-btn menu-btn" aria-label="Abrir menú" onClick={() => setOpen(true)}>
+            <Icon name="menu" />
+          </button>
+          <h1>{title}</h1>
+          <div className="header-actions">
+            {user ? (
+              <>
+                <Link to="/reportar" className="btn small hide-sm">
+                  <Icon name="plus" size={16} /> Reportar
+                </Link>
+                <Link to="/notificaciones" className="icon-btn" aria-label="Notificaciones">
+                  <Icon name="bell" />
+                  {unread > 0 && <span className="count">{unread > 9 ? "9+" : unread}</span>}
+                </Link>
+                <Link to="/mis-reportes" className="user-pill">
+                  <span className="avatar">{initials}</span>
+                  <span className="hide-sm">{user.full_name.split(" ")[0]}</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="btn small ghost">Entrar</Link>
+                <Link to="/registro" className="btn small">Registrarse</Link>
+              </>
+            )}
+          </div>
+        </header>
+
+        <main className="content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/mapa" element={<MapPage />} />
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/ia" element={<AIPage />} />
+            <Route path="/rutas" element={<RoutePage />} />
+            <Route path="/estructuras" element={<Structures />} />
+            <Route path="/reportar" element={<Private><NewReport /></Private>} />
+            <Route path="/mis-reportes" element={<Private><MyReports /></Private>} />
+            <Route path="/cuenta" element={<Private><Account /></Private>} />
+            <Route path="/notificaciones" element={<Private><Notifications /></Private>} />
+            <Route path="/moderacion" element={<Private moderator><Moderation /></Private>} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+      </div>
+      <AssistantFab />
+    </div>
   );
 }

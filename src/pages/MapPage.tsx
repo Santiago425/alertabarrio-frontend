@@ -3,7 +3,7 @@ import { Circle, CircleMarker, Popup } from "react-leaflet";
 import { api } from "../api/client";
 import type { Heatmap } from "../api/types";
 import BaseMap from "../components/BaseMap";
-import { Card, DSTag, ErrorBox, StatusBadge } from "../components/ui";
+import { Card, ErrorBox, StatusBadge } from "../components/ui";
 import { formatDate, heatRadius } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 
@@ -26,13 +26,7 @@ export default function MapPage() {
 
   return (
     <div className="stack-l">
-      <div className="row space wrap gap-s">
-        <div>
-          <h2>Mapa de alertas en vivo</h2>
-          <p className="muted">
-            Alertas publicadas y verificadas, coloreadas por gravedad. <DSTag>HashTable → LinkedList por barrio</DSTag>
-          </p>
-        </div>
+      <div className="toolbar">
         <button className="btn" onClick={toggleHeat}>
           {showHeat ? "Ocultar mapa de calor" : "🤖 Mapa de calor predictivo (IA)"}
         </button>
