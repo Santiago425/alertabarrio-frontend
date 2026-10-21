@@ -29,7 +29,7 @@ export const tokenStore = {
 };
 
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(public status: number, message: string, public twoFactorRequired = false) {
     super(message);
   }
 }
@@ -55,7 +55,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     } catch {
       /* respuesta sin JSON */
     }
-    throw new ApiError(res.status, message);
+    throw new ApiError(res.status, message, res.headers.get("X-2FA-Required") === "true");
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
@@ -77,7 +77,11 @@ export const api = {
   stats: () => request<DashboardStats>("/api/v1/stats"),
 
   // auth
-  login: (email: string, password: string) => post<TokenResponse>("/api/v1/auth/login", { email, password }),
+  login: (email: string, password: string, otp?: string) => post<TokenResponse>("/api/v1/auth/login", { email, password, otp: otp || undefined }),
+  logoutAll: () => post<TokenResponse>("/api/v1/auth/logout-all"),
+  twoFactorSetup: () => post<{ secret: string; otpauth_uri: string }>("/api/v1/auth/2fa/setup"),
+  twoFactorEnable: (code: string) => post<User>("/api/v1/auth/2fa/enable", { code }),
+  twoFactorDisable: (password: string, code: string) => post<User>("/api/v1/auth/2fa/disable", { password, code }),
   register: (data: { full_name: string; email: string; password: string; phone?: string; neighborhood_id?: number | null }) =>
     post<TokenResponse>("/api/v1/auth/register", data),
   me: () => request<User>("/api/v1/auth/me"),

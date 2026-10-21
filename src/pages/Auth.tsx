@@ -1,10 +1,13 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { api } from "../api/client";
+import QRCode from "qrcode";
+import { api, ApiError } from "../api/client";
+import type { User } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import Icon, { type IconName } from "../components/Icon";
+import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
-import { CITY_NAME } from "../lib/format";
+import { CITY_NAME, timeAgo } from "../lib/format";
 import { PASSWORD_RULES, passwordBytes, passwordStrength } from "../lib/password";
 import { useAsync } from "../lib/useAsync";
 
@@ -18,7 +21,7 @@ function AuthLayout({ children }: { children: ReactNode }) {
     <div className="auth">
       <section className="auth-form">
         <Link to="/" className="auth-logo">
-          <img src="/favicon.svg" alt="" width={34} height={34} />
+          <Logo size={38} />
           <span>AlertaBarrio</span>
         </Link>
         <div className="auth-inner">{children}</div>
@@ -26,6 +29,7 @@ function AuthLayout({ children }: { children: ReactNode }) {
       </section>
       <aside className="auth-show">
         <div className="show-copy">
+          <span className="show-kicker">Pasto · 2026</span>
           <h2>Tu barrio, más seguro entre todos.</h2>
           <p>Alertas en tiempo real, mapa de riesgo y un asistente con inteligencia artificial.</p>
         </div>
@@ -121,6 +125,8 @@ export function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [needsOtp, setNeedsOtp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -129,15 +135,60 @@ export function Login() {
     setBusy(true);
     setError(null);
     try {
-      const resp = await api.login(email, password);
+      const resp = await api.login(email, password, needsOtp ? otp : undefined);
       signIn(resp);
       navigate(resp.user.role === "citizen" ? "/" : "/moderacion");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error");
+      if (err instanceof ApiError && err.twoFactorRequired && !needsOtp) {
+        setNeedsOtp(true);
+      } else {
+        setError(err instanceof Error ? err.message : "Error");
+      }
     } finally {
       setBusy(false);
     }
   };
+
+  if (needsOtp) {
+    return (
+      <AuthLayout>
+        <h1 className="auth-title">Verificación en dos pasos</h1>
+        <p className="muted">Abre tu app de autenticación y escribe el código de 6 dígitos.</p>
+        <form onSubmit={submit} className="form auth-fields">
+          <div className="field">
+            <input
+              className="otp-input"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="000000"
+              aria-label="Código de verificación"
+              autoFocus
+              required
+            />
+          </div>
+          <ErrorBox message={error} />
+          <button className="btn block big" disabled={busy || otp.length !== 6}>
+            {busy ? "Verificando…" : "Verificar y entrar"}
+          </button>
+        </form>
+        <p className="auth-switch">
+          <button
+            type="button"
+            className="link-btn"
+            onClick={() => {
+              setNeedsOtp(false);
+              setOtp("");
+              setError(null);
+            }}
+          >
+            ← Volver
+          </button>
+        </p>
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout>
@@ -171,6 +222,9 @@ export function Login() {
       </div>
       <p className="auth-switch">
         ¿No tienes cuenta? <Link to="/registro">Regístrate gratis</Link>
+      </p>
+      <p className="secure-note">
+        <Icon name="lock" size={14} /> Conexión cifrada · contraseñas con bcrypt · verificación en dos pasos
       </p>
     </AuthLayout>
   );
@@ -249,7 +303,7 @@ export function Register() {
 }
 
 export function Account() {
-  const { user } = useAuth();
+  const { user, signIn, updateUser } = useAuth();
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -277,50 +331,150 @@ export function Account() {
     }
   };
 
+  const [sessionMsg, setSessionMsg] = useState<string | null>(null);
+  const logoutAll = async () => {
+    setSessionMsg(null);
+    try {
+      signIn(await api.logoutAll());
+      setSessionMsg("Se cerraron las sesiones en los demás dispositivos.");
+    } catch (err) {
+      setSessionMsg(err instanceof Error ? err.message : "Error");
+    }
+  };
+
   return (
-    <div className="narrow stack-l" style={{ margin: "0 auto" }}>
+    <div className="stack-l">
       <div>
-        <p className="eyebrow">Mi cuenta</p>
-        <h2>Seguridad</h2>
+        <h2>Seguridad de tu cuenta</h2>
         <p className="muted">
           {user?.full_name} · {user?.email}
+          {user?.last_login_at && <> · último ingreso {timeAgo(user.last_login_at)}</>}
         </p>
       </div>
-      <section className="card">
-        <h3>Cambiar contraseña</h3>
-        <form onSubmit={submit} className="form" style={{ marginTop: 12 }}>
-          <label>
-            Contraseña actual
-            <PasswordInput value={current} onChange={setCurrent} autoComplete="current-password" />
-          </label>
-          <label>
-            Nueva contraseña
-            <PasswordInput value={next} onChange={setNext} autoComplete="new-password" />
-          </label>
-          <PasswordStrength password={next} />
-          <label>
-            Repetir nueva contraseña
-            <PasswordInput value={confirm} onChange={setConfirm} autoComplete="new-password" />
-          </label>
-          <ErrorBox message={error} />
-          {msg && <div className="alert-ok">{msg}</div>}
-          <button className="btn" disabled={busy || !strong || !current}>
-            {busy ? "Guardando…" : "Cambiar contraseña"}
+      <div className="sec-grid">
+        <TwoFactorCard onChange={updateUser} enabled={!!user?.two_factor_enabled} />
+
+        <section className="panel">
+          <div className="panel-head">
+            <h3>
+              <Icon name="logout" size={16} /> Sesiones abiertas
+            </h3>
+          </div>
+          <p className="muted">¿Entraste desde otro celular o un computador público? Ciérralas todas con un clic.</p>
+          <button className="btn ghost" onClick={logoutAll}>
+            Cerrar sesión en todos los dispositivos
           </button>
-        </form>
-      </section>
-      <section className="card mini">
-        <h3>¿Cómo protegemos tu contraseña?</h3>
-        <ul className="steps">
-          <li>
-            No guardamos tu contraseña: guardamos un <b>hash bcrypt</b> (costo 12, con sal única por usuario). Es de una
-            sola vía, no se puede “desencriptar”.
-          </li>
-          <li>Al iniciar sesión se vuelve a calcular el hash y se compara.</li>
-          <li>Después de 5 intentos fallidos la cuenta se bloquea 10 minutos para frenar ataques de fuerza bruta.</li>
-          <li>La sesión usa un token JWT firmado que vence a las 12 horas.</li>
-        </ul>
-      </section>
+          {sessionMsg && <div className="alert-ok" style={{ marginTop: 12 }}>{sessionMsg}</div>}
+        </section>
+
+        <section className="panel">
+          <div className="panel-head">
+            <h3>
+              <Icon name="lock" size={16} /> Cambiar contraseña
+            </h3>
+          </div>
+          <form onSubmit={submit} className="form">
+            <PasswordInput value={current} onChange={setCurrent} autoComplete="current-password" placeholder="Contraseña actual" />
+            <PasswordInput value={next} onChange={setNext} autoComplete="new-password" placeholder="Nueva contraseña" />
+            {next && <PasswordStrength password={next} />}
+            <PasswordInput value={confirm} onChange={setConfirm} autoComplete="new-password" placeholder="Repite la nueva contraseña" />
+            <ErrorBox message={error} />
+            {msg && <div className="alert-ok">{msg}</div>}
+            <button className="btn" disabled={busy || !strong || !current}>
+              {busy ? "Guardando…" : "Cambiar contraseña"}
+            </button>
+          </form>
+        </section>
+      </div>
     </div>
+  );
+}
+
+function TwoFactorCard({ enabled, onChange }: { enabled: boolean; onChange: (u: User) => void }) {
+  const [setup, setSetup] = useState<{ secret: string; qr: string } | null>(null);
+  const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const run = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await fn();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const start = () =>
+    run(async () => {
+      const s = await api.twoFactorSetup();
+      setSetup({ secret: s.secret, qr: await QRCode.toDataURL(s.otpauth_uri, { margin: 1, width: 320 }) });
+    });
+  const enable = () =>
+    run(async () => {
+      onChange(await api.twoFactorEnable(code));
+      setSetup(null);
+      setCode("");
+    });
+  const disable = () =>
+    run(async () => {
+      onChange(await api.twoFactorDisable(password, code));
+      setCode("");
+      setPassword("");
+    });
+
+  return (
+    <section className="panel">
+      <div className="panel-head">
+        <h3>
+          <Icon name="shield" size={16} /> Verificación en dos pasos
+        </h3>
+        <span className={enabled ? "state-on" : "state-off"}>{enabled ? "Activada" : "Desactivada"}</span>
+      </div>
+      <p className="muted">Además de tu contraseña, te pediremos un código de Google Authenticator o Microsoft Authenticator.</p>
+
+      {!enabled && !setup && (
+        <button className="btn" onClick={start} disabled={busy}>
+          Activar verificación en dos pasos
+        </button>
+      )}
+
+      {!enabled && setup && (
+        <div className="form">
+          <div className="qr-box">
+            <img src={setup.qr} alt="Código QR para la app de autenticación" />
+            <div>
+              <p>1. Escanea el código con tu app.</p>
+              <p className="muted">¿No puedes escanear? Escribe esta clave:</p>
+              <div className="secret">{setup.secret}</div>
+            </div>
+          </div>
+          <p>2. Escribe el código de 6 dígitos que te muestra la app:</p>
+          <div className="field">
+            <input className="otp-input" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" placeholder="000000" aria-label="Código" />
+          </div>
+          <button className="btn" onClick={enable} disabled={busy || code.length !== 6}>
+            Confirmar y activar
+          </button>
+        </div>
+      )}
+
+      {enabled && (
+        <div className="form">
+          <PasswordInput value={password} onChange={setPassword} autoComplete="current-password" />
+          <div className="field">
+            <input className="otp-input" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" placeholder="000000" aria-label="Código" />
+          </div>
+          <button className="btn ghost" onClick={disable} disabled={busy || code.length !== 6 || !password}>
+            Desactivar
+          </button>
+        </div>
+      )}
+      <ErrorBox message={error} />
+    </section>
   );
 }

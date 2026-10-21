@@ -182,7 +182,7 @@ function StatusRing({ stats }: { stats: DashboardStats }) {
           const len = (r.value / total) * c;
           return (
             <g key={r.label}>
-              <circle cx="60" cy="60" r={radius} fill="none" stroke="#eef1f6" strokeWidth="8" />
+              <circle cx="60" cy="60" r={radius} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="8" />
               <circle
                 cx="60"
                 cy="60"
