@@ -37,3 +37,8 @@ export function useAiOnline(): AiState {
   }, []);
   return current;
 }
+
+/** Empieza a despertar la IA apenas abre la app, mientras el usuario inicia sesion. */
+export function despertarIa(): void {
+  void waitForAi();
+}
