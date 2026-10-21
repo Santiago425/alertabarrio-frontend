@@ -76,7 +76,8 @@ export const api = {
   hello: () => request<{ message: string; project: string; team: string[]; city?: string; server_time: string }>("/api/v1/hello"),
   stats: () => request<DashboardStats>("/api/v1/stats"),
 
-  login: (email: string, password: string, otp?: string) => post<TokenResponse>("/api/v1/auth/login", { email, password, otp: otp || undefined }),
+  login: (email: string, password: string, accountType: "user" | "admin", otp?: string) =>
+    post<TokenResponse>("/api/v1/auth/login", { email, password, account_type: accountType, otp: otp || undefined }),
   logoutAll: () => post<TokenResponse>("/api/v1/auth/logout-all"),
   twoFactorSetup: () => post<{ secret: string; otpauth_uri: string }>("/api/v1/auth/2fa/setup"),
   twoFactorEnable: (code: string) => post<User>("/api/v1/auth/2fa/enable", { code }),

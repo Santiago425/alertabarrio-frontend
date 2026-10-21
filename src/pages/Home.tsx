@@ -3,14 +3,16 @@ import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import type { DashboardStats, Heatmap, RankingRow, Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
+import { CityArt, Empty } from "../components/Art";
 import BaseMap from "../components/BaseMap";
 import Icon, { type IconName } from "../components/Icon";
 import { CITY_NAME, DAYS, greeting, longDate, timeAgo } from "../lib/format";
 import { useAiOnline } from "../lib/useAiOnline";
 import { useAsync } from "../lib/useAsync";
+import { useCountUp } from "../lib/useCountUp";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, isModerator } = useAuth();
   const stats = useAsync(() => api.stats(), []);
   const ranking = useAsync(() => api.ranking(), []);
   const feed = useAsync(() => api.feed(), []);
@@ -25,15 +27,24 @@ export default function Home() {
   return (
     <div className="dash">
       <div className="dash-welcome">
-        <div>
+        <div className="welcome-copy">
           <h2>
             {greeting()}
-            {user ? `, ${user.full_name.split(" ")[0]}` : ""} 👋
+            {user ? `, ${user.full_name.split(" ")[0]}` : ""}
           </h2>
-          <p className="muted">
+          <p>
             {longDate()} · {CITY_NAME}
           </p>
+          <div className="welcome-actions">
+            <Link to="/reportar" className="btn light">
+              <Icon name="plus" size={16} /> Reportar incidente
+            </Link>
+            <Link to="/mapa" className="btn glass">
+              <Icon name="map" size={16} /> Ver mapa
+            </Link>
+          </div>
         </div>
+        <CityArt className="welcome-art" />
         {ai !== "off" && (
           <span className={`live ${ai}`}>
             <i /> {aiOnline ? "IA en línea" : "Activando IA…"}
@@ -46,7 +57,11 @@ export default function Home() {
       <div className="dash-top">
         <div className="tiles">
           <Tile tone="hot" icon="alert" title="Alertas activas" value={s?.active_alerts} sub={s ? `${s.by_status.verified} verificadas` : ""} to="/feed" />
-          <Tile icon="shield" title="Por moderar" value={s?.pending_moderation} sub="en la cola" to="/moderacion" tint="#f59e0b" />
+          {isModerator ? (
+            <Tile icon="shield" title="Por moderar" value={s?.pending_moderation} sub="en la cola" to="/moderacion" tint="#f59e0b" />
+          ) : (
+            <Tile icon="check" title="Verificadas" value={s?.by_status.verified} sub="confirmadas por vecinos" to="/feed" tint="#16a34a" />
+          )}
           <Tile
             icon="chart"
             title="Esta semana"
@@ -145,13 +160,14 @@ function Tile({
   tint?: string;
   to: string;
 }) {
+  const shown = useCountUp(value);
   return (
     <Link to={to} className={`tile ${tone ?? ""}`}>
       <span className="tile-icon" style={tone ? undefined : { background: `${tint}17`, color: tint }}>
         <Icon name={icon} size={22} />
       </span>
       <span className="tile-text">
-        <b>{value ?? "—"}</b>
+        <b>{shown ?? "—"}</b>
         <span>{title}</span>
         <small>{sub}</small>
       </span>
@@ -210,7 +226,7 @@ function latest(reports: Report[]): Report[] {
 }
 
 function RecentCards({ reports }: { reports: Report[] }) {
-  if (!reports.length) return <p className="muted">No hay alertas activas 🎉</p>;
+  if (!reports.length) return <Empty text="No hay alertas activas" />;
   return (
     <div className="recent">
       {reports.map((r) => {
@@ -293,7 +309,7 @@ function RiskSchedule({ heat }: { heat: Heatmap }) {
 
 function TopHoods({ rows }: { rows: RankingRow[] }) {
   const list = rows.filter((r) => r.active_alerts > 0).slice(0, 5);
-  if (!list.length) return <p className="muted">No hay alertas activas 🎉</p>;
+  if (!list.length) return <Empty text="No hay alertas activas" />;
   return (
     <ol className="top-hoods">
       {list.map((r, i) => (

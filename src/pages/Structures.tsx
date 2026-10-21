@@ -1,5 +1,7 @@
 import { api } from "../api/client";
+import type { ReportStatus } from "../api/types";
 import { Card, HeapTree } from "../components/ui";
+import { STATUS_LABEL } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 
 /* Pagina para la sustentacion: muestra el estado interno de cada estructura
@@ -61,7 +63,7 @@ export default function Structures() {
                 <div key={id} className="mini-stack">
                   <b>#{id}</b>
                   {items.map((st, i) => (
-                    <span key={i} className={i === 0 ? "top" : ""}>{st}</span>
+                    <span key={i} className={i === 0 ? "top" : ""}>{STATUS_LABEL[st as ReportStatus] ?? st}</span>
                   ))}
                 </div>
               ))}
