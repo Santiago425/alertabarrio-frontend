@@ -33,7 +33,7 @@ export function CityArt({ className = "" }: { className?: string }) {
         <rect x="492" y="240" width="56" height="60" rx="4" />
         <rect x="556" y="222" width="34" height="78" rx="4" />
       </g>
-      <g fill="#a855f7" opacity=".55">
+      <g fill="#c79a2c" opacity=".55">
         <rect x="50" y="248" width="8" height="8" rx="2" />
         <rect x="66" y="248" width="8" height="8" rx="2" />
         <rect x="50" y="266" width="8" height="8" rx="2" />
@@ -58,7 +58,7 @@ export function CityArt({ className = "" }: { className?: string }) {
         <path d="M332 168 L345 146 L358 168Z" />
         <path d="M276 214 Q300 170 324 214Z" />
       </g>
-      <g fill="#c026d3" opacity=".5">
+      <g fill="#b5452b" opacity=".5">
         <path d="M288 300 V262 Q300 246 312 262 V300Z" />
         <circle cx="300" cy="232" r="7" />
         <rect x="250" y="186" width="10" height="14" rx="5" />
@@ -69,16 +69,16 @@ export function CityArt({ className = "" }: { className?: string }) {
       <path className="art-route" d="M70 318 C160 296 220 330 300 312 C380 294 450 328 540 308" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeDasharray="2 12" />
 
       <g className="art-pin a">
-        <path d="M110 214c-12 0-22 9.6-22 21.5 0 14.8 18.3 30.6 20.4 32.4a2.5 2.5 0 0 0 3.2 0c2.1-1.8 20.4-17.6 20.4-32.4 0-11.9-10-21.5-22-21.5Z" fill="#f43f5e" />
+        <path d="M110 214c-12 0-22 9.6-22 21.5 0 14.8 18.3 30.6 20.4 32.4a2.5 2.5 0 0 0 3.2 0c2.1-1.8 20.4-17.6 20.4-32.4 0-11.9-10-21.5-22-21.5Z" fill="#b5452b" />
         <circle cx="110" cy="235" r="8" fill="#fff" />
       </g>
       <g className="art-pin b">
-        <path d="M466 176c-12 0-22 9.6-22 21.5 0 14.8 18.3 30.6 20.4 32.4a2.5 2.5 0 0 0 3.2 0c2.1-1.8 20.4-17.6 20.4-32.4 0-11.9-10-21.5-22-21.5Z" fill="#f59e0b" />
+        <path d="M466 176c-12 0-22 9.6-22 21.5 0 14.8 18.3 30.6 20.4 32.4a2.5 2.5 0 0 0 3.2 0c2.1-1.8 20.4-17.6 20.4-32.4 0-11.9-10-21.5-22-21.5Z" fill="#c79a2c" />
         <circle cx="466" cy="197" r="8" fill="#fff" />
       </g>
       <g className="art-pin c">
         <circle cx="300" cy="130" r="26" fill="#fff" />
-        <path d="M300 114l-11 4v8c0 7 4.7 12.8 11 14.8 6.3-2 11-7.8 11-14.8v-8Z" fill="#7c3aed" />
+        <path d="M300 114l-11 4v8c0 7 4.7 12.8 11 14.8 6.3-2 11-7.8 11-14.8v-8Z" fill="#1f5f4a" />
         <path d="M295 127l4 4 7-8" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
       </g>
     </svg>
@@ -91,13 +91,13 @@ export function ShieldArt({ size = 120 }: { size?: number }) {
     <svg width={size} height={size} viewBox="0 0 120 120" className="shield-art" aria-hidden="true">
       <defs>
         <linearGradient id="shieldArtGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#7c3aed" />
-          <stop offset=".55" stopColor="#c026d3" />
-          <stop offset="1" stopColor="#f43f5e" />
+          <stop offset="0" stopColor="#133d30" />
+          <stop offset=".55" stopColor="#1f5f4a" />
+          <stop offset="1" stopColor="#2c7458" />
         </linearGradient>
       </defs>
-      <circle cx="60" cy="60" r="56" fill="#7c3aed" opacity=".08" />
-      <circle cx="60" cy="60" r="42" fill="#7c3aed" opacity=".1" />
+      <circle cx="60" cy="60" r="56" fill="#1f5f4a" opacity=".08" />
+      <circle cx="60" cy="60" r="42" fill="#1f5f4a" opacity=".1" />
       <path d="M60 26 36 35v18c0 15.4 10.2 28.4 24 32.6 13.8-4.2 24-17.2 24-32.6V35Z" fill="url(#shieldArtGrad)" />
       <path d="M48 56l8.5 8.5L73 48" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>

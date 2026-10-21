@@ -6,6 +6,7 @@ import type { User } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import Icon, { type IconName } from "../components/Icon";
 import { CityArt } from "../components/Art";
+import { Franja, SolPastos } from "../components/Pasto";
 import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
 import { CITY_NAME, timeAgo } from "../lib/format";
@@ -33,6 +34,8 @@ function AuthLayout({ children }: { children: ReactNode }) {
         <small className="muted">© {new Date().getFullYear()} AlertaBarrio · {CITY_NAME}</small>
       </section>
       <aside className="auth-show">
+        <Franja className="show-franja" />
+        <SolPastos size={300} tone="light" className="show-sol" />
         <CityArt className="show-art" />
         <div className="show-copy">
           <h2>Tu barrio, más seguro entre todos.</h2>

@@ -6,6 +6,7 @@ import { AssistantFab } from "./components/Assistant";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Icon, { type IconName } from "./components/Icon";
 import Logo from "./components/Logo";
+import { Franja, SolPastos } from "./components/Pasto";
 import { CITY_NAME } from "./lib/format";
 import { useAiOnline } from "./lib/useAiOnline";
 import { useAsync } from "./lib/useAsync";
@@ -88,6 +89,7 @@ function Shell() {
   return (
     <div className={`shell ${open ? "menu-open" : ""}`}>
       <aside className="sidebar">
+        <SolPastos size={230} tone="light" className="side-sol" />
         <Link to="/" className="side-brand">
           <Logo size={36} />
           <span>
@@ -95,6 +97,7 @@ function Shell() {
             <small>{CITY_NAME}, Nariño</small>
           </span>
         </Link>
+        <Franja className="side-franja" height={10} />
 
         <nav className="side-nav">
           <NavItem to="/" end icon="home" label="Panel" />
@@ -112,7 +115,7 @@ function Shell() {
             <p className="side-title">Mis barrios</p>
             {subs.data.slice(0, 5).map((s, i) => (
               <Link key={s.neighborhood.id} to="/feed" className="side-hood">
-                <i style={{ background: ["#fff", "#fde047", "#67e8f9", "#86efac", "#fda4af"][i % 5] }} />
+                <i style={{ background: ["#f3ecd9", "#e2c26f", "#e8916d", "#8fc9a8", "#d9c58f"][i % 5] }} />
                 {s.neighborhood.name}
               </Link>
             ))}
