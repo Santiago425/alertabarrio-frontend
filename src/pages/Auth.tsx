@@ -5,16 +5,12 @@ import { api, ApiError } from "../api/client";
 import type { User } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import Icon, { type IconName } from "../components/Icon";
+import { CityArt } from "../components/Art";
 import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
 import { CITY_NAME, timeAgo } from "../lib/format";
 import { PASSWORD_RULES, passwordBytes, passwordStrength } from "../lib/password";
 import { useAsync } from "../lib/useAsync";
-
-const DEMO_USERS = [
-  ["ana@alertabarrio.co", "Vecina (Centro)"],
-  ["moderador@alertabarrio.co", "Moderador"],
-];
 
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: "plus", title: "Reporta incidentes", text: "Robos, riñas o daños con ubicación exacta." },
@@ -37,6 +33,7 @@ function AuthLayout({ children }: { children: ReactNode }) {
         <small className="muted">© {new Date().getFullYear()} AlertaBarrio · {CITY_NAME}</small>
       </section>
       <aside className="auth-show">
+        <CityArt className="show-art" />
         <div className="show-copy">
           <h2>Tu barrio, más seguro entre todos.</h2>
           <p>AlertaBarrio conecta a los vecinos de {CITY_NAME} para avisar y prevenir incidentes.</p>
@@ -123,6 +120,7 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [needsOtp, setNeedsOtp] = useState(false);
+  const [kind, setKind] = useState<"user" | "admin">("user");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -131,7 +129,7 @@ export function Login() {
     setBusy(true);
     setError(null);
     try {
-      const resp = await api.login(email, password, needsOtp ? otp : undefined);
+      const resp = await api.login(email, password, kind, needsOtp ? otp : undefined);
       signIn(resp);
       navigate(resp.user.role === "citizen" ? "/" : "/moderacion");
     } catch (err) {
@@ -189,6 +187,28 @@ export function Login() {
   return (
     <AuthLayout>
       <h1 className="auth-title">Bienvenido de nuevo</h1>
+      <div className="role-switch" role="tablist" aria-label="Tipo de cuenta">
+        {(
+          [
+            ["user", "user", "Usuario"],
+            ["admin", "shield", "Administrador"],
+          ] as const
+        ).map(([value, icon, label]) => (
+          <button
+            key={value}
+            type="button"
+            role="tab"
+            aria-selected={kind === value}
+            className={kind === value ? "on" : ""}
+            onClick={() => {
+              setKind(value);
+              setError(null);
+            }}
+          >
+            <Icon name={icon} size={16} /> {label}
+          </button>
+        ))}
+      </div>
       <form onSubmit={submit} className="form auth-fields">
         <Field icon="mail">
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="Correo electrónico" aria-label="Correo" required />
@@ -196,28 +216,14 @@ export function Login() {
         <PasswordInput value={password} onChange={setPassword} autoComplete="current-password" />
         <ErrorBox message={error} />
         <button className="btn block big" disabled={busy}>
-          {busy ? "Entrando…" : "Iniciar sesión"}
+          {busy ? "Entrando…" : kind === "admin" ? "Entrar como administrador" : "Iniciar sesión"}
         </button>
       </form>
-      <div className="divider"><span>cuentas de prueba</span></div>
-      <div className="demo-row">
-        {DEMO_USERS.map(([mail, label]) => (
-          <button
-            key={mail}
-            className="btn ghost"
-            type="button"
-            onClick={() => {
-              setEmail(mail);
-              setPassword("Alerta2026*");
-            }}
-          >
-            <Icon name={mail.startsWith("moderador") ? "shield" : "user"} size={16} /> {label}
-          </button>
-        ))}
-      </div>
-      <p className="auth-switch">
-        ¿No tienes cuenta? <Link to="/registro">Regístrate gratis</Link>
-      </p>
+      {kind === "user" && (
+        <p className="auth-switch">
+          ¿No tienes cuenta? <Link to="/registro">Regístrate gratis</Link>
+        </p>
+      )}
     </AuthLayout>
   );
 }

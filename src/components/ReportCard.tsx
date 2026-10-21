@@ -3,6 +3,7 @@ import { api } from "../api/client";
 import type { Report, StatusEntry } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { pct, timeAgo } from "../lib/format";
+import Icon from "./Icon";
 import { StackView, StatusBadge, TypeBadge } from "./ui";
 
 interface Props {
@@ -51,7 +52,7 @@ export default function ReportCard({ report, onChanged, actions }: Props) {
       {report.photos[0] && <img className="report-photo" src={report.photos[0]} alt="foto del reporte" />}
       {report.ai_suggested_type && (
         <p className="ai-line">
-          🤖 IA: parece <b>{report.ai_suggested_type.name}</b> ({pct(report.ai_confidence)}) · riesgo de la zona a esa
+          <Icon name="sparkles" size={14} /> IA: parece <b>{report.ai_suggested_type.name}</b> ({pct(report.ai_confidence)}) · riesgo de la zona a esa
           hora {pct(report.ai_zone_risk)}
         </p>
       )}
@@ -63,7 +64,7 @@ export default function ReportCard({ report, onChanged, actions }: Props) {
         <div className="row gap-s">
           {canVerify && (
             <button className="btn small" onClick={verify}>
-              ✔ Yo también lo vi
+              <Icon name="check" size={14} /> Yo también lo vi
             </button>
           )}
           <button className="btn small ghost" onClick={toggleHistory}>

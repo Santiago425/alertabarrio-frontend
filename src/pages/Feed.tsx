@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api } from "../api/client";
 import type { Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
+import { Empty } from "../components/Art";
 import ReportCard from "../components/ReportCard";
 import { Card, ErrorBox, Loading } from "../components/ui";
 import { useAiOnline } from "../lib/useAiOnline";
@@ -38,7 +39,7 @@ export default function Feed() {
 
       <ErrorBox message={feed.error} />
       {feed.loading && <Loading />}
-      {feed.data?.length === 0 && <p className="muted">No hay alertas activas aquí. 🎉</p>}
+      {feed.data?.length === 0 && <Empty text="No hay alertas activas aquí" />}
       <div className="stack-m">
         {feed.data?.map((r) => (
           <ReportCard key={r.id} report={r} onChanged={replace} />
@@ -54,7 +55,7 @@ export function MyReports() {
     <div className="stack-l">
       <ErrorBox message={mine.error} />
       {mine.loading && <Loading />}
-      {mine.data?.length === 0 && <p className="muted">Aún no has hecho reportes.</p>}
+      {mine.data?.length === 0 && <Empty text="Aún no has hecho reportes" />}
       <div className="stack-m">
         {mine.data?.map((r) => (
           <ReportCard key={r.id} report={r} />

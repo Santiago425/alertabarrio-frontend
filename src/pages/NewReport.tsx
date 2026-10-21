@@ -3,7 +3,9 @@ import { CircleMarker, useMapEvents } from "react-leaflet";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import type { ReportCreated } from "../api/types";
+import { ShieldArt } from "../components/Art";
 import BaseMap from "../components/BaseMap";
+import Icon from "../components/Icon";
 import { Card, DSTag, ErrorBox, TypeBadge } from "../components/ui";
 import { pct } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
@@ -63,7 +65,10 @@ export default function NewReport() {
     const { report, ai } = result;
     return (
       <div className="stack-l narrow">
-        <h2>✅ Reporte enviado</h2>
+        <div className="success-head">
+          <ShieldArt size={96} />
+          <h2>Reporte enviado</h2>
+        </div>
         <Card title="Lo que hizo el sistema con tu reporte">
           <ol className="steps">
             <li>Se guardó en la base de datos con estado <b>Creado</b> (reporte #{report.id}).</li>
@@ -99,7 +104,6 @@ export default function NewReport() {
   return (
     <div className="two-col">
       <form onSubmit={submit} className="form card">
-        <h2>Reportar un incidente</h2>
         <label>
           ¿Qué pasó? (título corto)
           <input value={form.title} onChange={set("title")} required minLength={4} maxLength={150} placeholder="Ej: Atraco en la esquina de la panadería" />
@@ -143,7 +147,7 @@ export default function NewReport() {
         <div className="row space">
           <p className="muted">Toca el mapa para marcar dónde ocurrió.</p>
           <button type="button" className="btn small ghost" onClick={useMyLocation}>
-            📍 Usar mi ubicación
+            <Icon name="pin" size={14} /> Usar mi ubicación
           </button>
         </div>
         <BaseMap height={520}>

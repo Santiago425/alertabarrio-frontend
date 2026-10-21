@@ -52,7 +52,7 @@ function NavItem({ to, icon, label, end }: { to: string; icon: IconName; label: 
 }
 
 export default function App() {
-  const { user, loading } = useAuth();
+  const { user, loading, isModerator } = useAuth();
   const location = useLocation();
   const isAuth = location.pathname === "/login" || location.pathname === "/registro";
 
@@ -66,7 +66,7 @@ export default function App() {
       </Routes>
     );
   }
-  if (isAuth) return <Navigate to="/" replace />;
+  if (isAuth) return <Navigate to={isModerator ? "/moderacion" : "/"} replace />;
   return <Shell />;
 }
 
@@ -120,20 +120,11 @@ function Shell() {
         )}
 
         <div className="side-bottom">
-          {user ? (
-            <>
-              <NavItem to="/cuenta" icon="lock" label="Mi cuenta" />
-              <button className="side-link" onClick={signOut}>
-                <Icon name="logout" />
-                <span>Cerrar sesión</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="btn block">Iniciar sesión</Link>
-              <Link to="/registro" className="side-link center">Crear cuenta</Link>
-            </>
-          )}
+          <NavItem to="/cuenta" icon="lock" label="Mi cuenta" />
+          <button className="side-link" onClick={signOut}>
+            <Icon name="logout" />
+            <span>Cerrar sesión</span>
+          </button>
         </div>
       </aside>
       <div className="backdrop" onClick={() => setOpen(false)} />
@@ -145,26 +136,20 @@ function Shell() {
           </button>
           <h1>{title}</h1>
           <div className="header-actions">
-            {user ? (
-              <>
-                <Link to="/reportar" className="btn small hide-sm">
-                  <Icon name="plus" size={16} /> Reportar
-                </Link>
-                <Link to="/notificaciones" className="icon-btn" aria-label="Notificaciones">
-                  <Icon name="bell" />
-                  {unread > 0 && <span className="count">{unread > 9 ? "9+" : unread}</span>}
-                </Link>
-                <Link to="/mis-reportes" className="user-pill">
-                  <span className="avatar">{initials}</span>
-                  <span className="hide-sm">{user.full_name.split(" ")[0]}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="btn small ghost">Entrar</Link>
-                <Link to="/registro" className="btn small">Registrarse</Link>
-              </>
-            )}
+            <Link to="/reportar" className="btn small hide-sm">
+              <Icon name="plus" size={16} /> Reportar
+            </Link>
+            <Link to="/notificaciones" className="icon-btn" aria-label="Notificaciones">
+              <Icon name="bell" />
+              {unread > 0 && <span className="count">{unread > 9 ? "9+" : unread}</span>}
+            </Link>
+            <Link to="/mis-reportes" className="user-pill">
+              <span className="avatar">{initials}</span>
+              <span className="hide-sm">
+                {(user?.full_name ?? "").split(" ")[0]}
+                <small>{isModerator ? "Administrador" : "Usuario"}</small>
+              </span>
+            </Link>
           </div>
         </header>
 
