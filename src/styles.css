@@ -671,3 +671,25 @@ body {
   .auth-show { padding-top: 56px; }
   .show-franja { top: 18px; left: 22px; width: calc(100% - 44px) !important; }
 }
+
+/* ============================================================ fotos de Pasto */
+.carrusel { position: relative; margin: 0; overflow: hidden; background: #133d30; }
+.carrusel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.06); transition: opacity 1.2s ease, transform 7s ease-out; }
+.carrusel img.on { opacity: 1; transform: scale(1); }
+.carrusel figcaption { position: absolute; left: 16px; bottom: 14px; right: 16px; display: flex; flex-direction: column; gap: 2px; color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5); z-index: 2; }
+.carrusel figcaption b { font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.05rem; }
+.carrusel figcaption a { color: rgba(255, 255, 255, 0.78) !important; font-size: 0.68rem; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.carrusel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(10, 30, 24, 0.7)); pointer-events: none; }
+
+.show-fotos { height: 300px; border-radius: 22px; max-width: 620px; box-shadow: 0 24px 50px rgba(0, 0, 0, 0.3); border: 3px solid rgba(226, 194, 111, 0.55); }
+.welcome-fotos { position: absolute !important; inset: 0 0 0 38%; z-index: 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%); mask-image: linear-gradient(90deg, transparent, #000 35%); }
+.welcome-fotos figcaption { left: auto; text-align: right; bottom: 22px; align-items: flex-end; }
+.dash-welcome { min-height: 230px; grid-template-columns: 1fr; }
+.dash-welcome .welcome-copy { z-index: 1; padding: 6px 0 30px; }
+.dash-welcome .live { z-index: 3; }
+.welcome-franja { z-index: 3; }
+@media (max-width: 760px) {
+  .show-fotos { height: 210px; }
+  .welcome-fotos { inset: 0; opacity: 0.35; -webkit-mask-image: none; mask-image: none; }
+  .welcome-fotos figcaption { display: none; }
+}
