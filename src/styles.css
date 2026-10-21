@@ -693,3 +693,12 @@ body {
   .welcome-fotos { inset: 0; opacity: 0.35; -webkit-mask-image: none; mask-image: none; }
   .welcome-fotos figcaption { display: none; }
 }
+
+/* pantalla de carga */
+.splash { position: fixed; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; background: var(--bg); color: var(--text); }
+.splash .sol-pastos { position: absolute; top: 50%; left: 50%; width: 360px; height: 360px; margin: -200px 0 0 -180px; opacity: 0.16; }
+.splash .sol-rays { animation-duration: 8s; }
+.splash .logo { position: relative; animation: pop 0.6s ease both; }
+.splash b { position: relative; font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.4rem; }
+.splash span { position: relative; color: var(--muted); font-size: 0.9rem; animation: fade 1.4s ease-in-out infinite; }
+@keyframes fade { 50% { opacity: 0.45; } }

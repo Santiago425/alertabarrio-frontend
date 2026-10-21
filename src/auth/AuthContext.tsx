@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import { api, tokenStore } from "../api/client";
+import { ApiError, api, tokenStore } from "../api/client";
 import type { TokenResponse, User } from "../api/types";
 
 interface AuthState {
@@ -22,11 +22,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
-    api
-      .me()
-      .then(setUser)
-      .catch(() => tokenStore.clear())
-      .finally(() => setLoading(false));
+    let cancel = false;
+    const load = (tries: number): void => {
+      api
+        .me()
+        .then((u) => !cancel && setUser(u))
+        .then(() => !cancel && setLoading(false))
+        .catch((e) => {
+          if (cancel) return;
+          // El servidor gratuito tarda en despertar: reintenta antes de cerrar la sesion
+          const waking = !(e instanceof ApiError) || e.status === 0 || e.status >= 500;
+          if (waking && tries > 0) {
+            setTimeout(() => load(tries - 1), 3000);
+            return;
+          }
+          if (!waking) tokenStore.clear();
+          setLoading(false);
+        });
+    };
+    load(25);
+    return () => {
+      cancel = true;
+    };
   }, []);
 
   const signIn = useCallback((resp: TokenResponse) => {

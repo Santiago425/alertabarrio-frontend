@@ -57,7 +57,15 @@ export default function App() {
   const location = useLocation();
   const isAuth = location.pathname === "/login" || location.pathname === "/registro";
 
-  if (loading) return null;
+  if (loading)
+    return (
+      <div className="splash">
+        <SolPastos size={120} />
+        <Logo size={52} />
+        <b>AlertaBarrio</b>
+        <span>Conectando con el servidor…</span>
+      </div>
+    );
   if (!user) {
     if (!isAuth) return <Navigate to="/login" replace />;
     return (
