@@ -6,6 +6,7 @@ import { useAuth } from "../auth/AuthContext";
 import BaseMap from "../components/BaseMap";
 import Icon, { type IconName } from "../components/Icon";
 import { CITY_NAME, DAYS, greeting, longDate, timeAgo } from "../lib/format";
+import { useAiOnline } from "../lib/useAiOnline";
 import { useAsync } from "../lib/useAsync";
 
 export default function Home() {
@@ -13,10 +14,11 @@ export default function Home() {
   const stats = useAsync(() => api.stats(), []);
   const ranking = useAsync(() => api.ranking(), []);
   const feed = useAsync(() => api.feed(), []);
-  const heat = useAsync(() => api.heatmap(), []);
-  const ai = useAsync(() => api.aiStatus(), []);
+  const ai = useAiOnline();
+  const aiOnline = ai === "on";
+  const heat = useAsync(() => api.heatmap(), [ai]);
   const hood = user?.neighborhood?.id ?? 1;
-  const summary = useAsync(() => api.dailySummary(hood), [hood]);
+  const summary = useAsync(() => api.dailySummary(hood), [hood, ai]);
   const s = stats.data;
   const change = s && s.last_week ? Math.round(((s.this_week - s.last_week) / s.last_week) * 100) : null;
 
@@ -32,9 +34,11 @@ export default function Home() {
             {longDate()} · {CITY_NAME}
           </p>
         </div>
-        <span className={`live ${ai.data?.available ? "on" : ""}`}>
-          <i /> {ai.data?.available ? "IA en línea" : ai.data ? "IA sin conexión" : "Conectando…"}
-        </span>
+        {ai !== "off" && (
+          <span className={`live ${ai}`}>
+            <i /> {aiOnline ? "IA en línea" : "Activando IA…"}
+          </span>
+        )}
       </div>
 
       {stats.error && <div className="alert-error">Sin conexión con el servidor. Intenta de nuevo en un momento.</div>}
@@ -75,7 +79,7 @@ export default function Home() {
             <h3>Horario de riesgo</h3>
             <span className="tag">Predicción IA</span>
           </div>
-          {heat.data ? <RiskSchedule heat={heat.data} /> : <Skeleton lines={5} />}
+          {heat.data && (heat.data.available || ai !== "waking") ? <RiskSchedule heat={heat.data} /> : <Skeleton lines={5} />}
         </section>
         <section className="panel">
           <div className="panel-head">
@@ -115,7 +119,7 @@ export default function Home() {
             </h3>
             <span className="tag">{summary.data?.neighborhood.name ?? "…"}</span>
           </div>
-          {summary.loading ? <Skeleton lines={4} /> : <p className="summary">{summary.data?.summary_text ?? "No disponible ahora."}</p>}
+          {summary.loading || (ai === "waking" && summary.data?.available === false) ? <Skeleton lines={4} /> : <p className="summary">{summary.data?.summary_text ?? "No disponible ahora."}</p>}
           {s && <MiniBars data={s.timeline} />}
         </section>
       </div>

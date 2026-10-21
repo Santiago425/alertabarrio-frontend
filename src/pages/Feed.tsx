@@ -4,6 +4,7 @@ import type { Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import ReportCard from "../components/ReportCard";
 import { Card, ErrorBox, Loading } from "../components/ui";
+import { useAiOnline } from "../lib/useAiOnline";
 import { useAsync } from "../lib/useAsync";
 
 export default function Feed() {
@@ -11,7 +12,8 @@ export default function Feed() {
   const [hood, setHood] = useState<number | undefined>(user?.neighborhood?.id);
   const neighborhoods = useAsync(() => api.neighborhoods(), []);
   const feed = useAsync(() => api.feed(hood), [hood]);
-  const summary = useAsync(() => (hood ? api.dailySummary(hood) : Promise.resolve(null)), [hood]);
+  const ai = useAiOnline();
+  const summary = useAsync(() => (hood ? api.dailySummary(hood) : Promise.resolve(null)), [hood, ai]);
 
   const replace = (r: Report) => feed.setData((feed.data ?? []).map((x) => (x.id === r.id ? r : x)));
 
@@ -30,7 +32,7 @@ export default function Feed() {
 
       {hood && (
         <Card title="Resumen del día · IA">
-          {summary.loading ? <Loading text="Generando resumen…" /> : <p className="summary">{summary.data?.summary_text}</p>}
+          {summary.loading || (ai === "waking" && summary.data?.available === false) ? <Loading text="Generando resumen…" /> : <p className="summary">{summary.data?.summary_text}</p>}
         </Card>
       )}
 
