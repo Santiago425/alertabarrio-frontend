@@ -76,7 +76,6 @@ export const api = {
   hello: () => request<{ message: string; project: string; team: string[]; city?: string; server_time: string }>("/api/v1/hello"),
   stats: () => request<DashboardStats>("/api/v1/stats"),
 
-  // auth
   login: (email: string, password: string, otp?: string) => post<TokenResponse>("/api/v1/auth/login", { email, password, otp: otp || undefined }),
   logoutAll: () => post<TokenResponse>("/api/v1/auth/logout-all"),
   twoFactorSetup: () => post<{ secret: string; otpauth_uri: string }>("/api/v1/auth/2fa/setup"),
@@ -88,13 +87,11 @@ export const api = {
   changePassword: (current_password: string, new_password: string) =>
     request<void>("/api/v1/auth/change-password", { method: "POST", body: JSON.stringify({ current_password, new_password }) }),
 
-  // catalogo
   neighborhoods: () => request<Neighborhood[]>("/api/v1/neighborhoods"),
   connections: () => request<Connection[]>("/api/v1/neighborhoods/connections"),
   ranking: () => request<RankingRow[]>("/api/v1/neighborhoods/ranking"),
   incidentTypes: () => request<IncidentType[]>("/api/v1/incident-types"),
 
-  // reportes
   createReport: (data: unknown) => post<ReportCreated>("/api/v1/reports", data),
   feed: (neighborhoodId?: number) => request<Report[]>(`/api/v1/feed${qs({ neighborhood_id: neighborhoodId, limit: 100 })}`),
   mapReports: () => request<Report[]>("/api/v1/reports/map"),
@@ -104,7 +101,6 @@ export const api = {
   history: (id: number) => request<StatusEntry[]>(`/api/v1/reports/${id}/history`),
   verify: (id: number) => post<Report>(`/api/v1/reports/${id}/verify`, { is_confirmed: true }),
 
-  // moderacion
   queue: () => request<ModerationQueue>("/api/v1/moderation/queue"),
   inReview: () => request<Report[]>("/api/v1/moderation/in-review"),
   takeNext: () => post<Report>("/api/v1/moderation/next"),
@@ -112,14 +108,12 @@ export const api = {
   reject: (id: number, note?: string) => post<Report>(`/api/v1/moderation/reports/${id}/reject`, { note }),
   undo: (id: number) => post<UndoResult>(`/api/v1/moderation/reports/${id}/undo`),
 
-  // suscripciones y notificaciones
   mySubscriptions: () => request<Subscription[]>("/api/v1/subscriptions/me"),
   subscribe: (nid: number) => post<{ subscribed: boolean }>(`/api/v1/subscriptions/${nid}`),
   unsubscribe: (nid: number) => request<{ subscribed: boolean }>(`/api/v1/subscriptions/${nid}`, { method: "DELETE" }),
   notifications: () => request<Notification[]>("/api/v1/notifications/me"),
   markRead: (id: number) => post<Notification>(`/api/v1/notifications/${id}/read`),
 
-  // IA
   aiStatus: () => request<Record<string, unknown>>("/api/v1/ai/status"),
   heatmap: (days = 120) => request<Heatmap>(`/api/v1/ai/heatmap${qs({ days })}`),
   chat: (question: string, neighborhoodId?: number | null) =>
@@ -127,7 +121,6 @@ export const api = {
   dailySummary: (neighborhoodId: number, refresh = false) =>
     request<DailySummary>(`/api/v1/ai/daily-summary${qs({ neighborhood_id: neighborhoodId, refresh })}`),
 
-  // rutas y estructuras
   safeRoute: (fromId: number, toId: number) => request<SafeRoute>(`/api/v1/routes/safe${qs({ from_id: fromId, to_id: toId })}`),
   dsState: () => request<Record<string, unknown>>("/api/v1/ds/state"),
 };

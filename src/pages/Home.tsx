@@ -37,7 +37,7 @@ export default function Home() {
         </span>
       </div>
 
-      {stats.error && <div className="alert-error">No hay conexión con el servidor. Si estaba dormido tarda un minuto; recarga en un momento.</div>}
+      {stats.error && <div className="alert-error">Sin conexión con el servidor. Intenta de nuevo en un momento.</div>}
 
       <div className="dash-top">
         <div className="tiles">
@@ -123,7 +123,6 @@ export default function Home() {
   );
 }
 
-// ---------------------------------------------------------------- piezas
 
 function Tile({
   icon,
@@ -182,7 +181,7 @@ function StatusRing({ stats }: { stats: DashboardStats }) {
           const len = (r.value / total) * c;
           return (
             <g key={r.label}>
-              <circle cx="60" cy="60" r={radius} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="8" />
+              <circle cx="60" cy="60" r={radius} fill="none" stroke="#eceffa" strokeWidth="8" />
               <circle
                 cx="60"
                 cy="60"
@@ -246,7 +245,6 @@ const BLOCK_COLORS = ["#a855f7", "#3b82f6", "#f59e0b", "#e11d48"];
 const BLOCK_LABELS = ["Madrugada", "Mañana", "Tarde", "Noche"];
 
 function RiskSchedule({ heat }: { heat: Heatmap }) {
-  // Un renglon por barrio (los 4 mas riesgosos) y una barra por cada franja horaria caliente
   const hoods = (heat.neighborhood_risk ?? []).slice(0, 4);
   if (!hoods.length) return <p className="muted">Aún no hay suficiente historial.</p>;
   return (

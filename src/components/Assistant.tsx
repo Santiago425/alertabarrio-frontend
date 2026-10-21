@@ -70,7 +70,6 @@ export default function AssistantChat({ compact = false }: { compact?: boolean }
         {messages.map((m, i) => (
           <div key={i} className={`bubble ${m.from}`}>
             <span>{m.text}</span>
-            {m.model && <small>{m.model}</small>}
           </div>
         ))}
         {busy && (
