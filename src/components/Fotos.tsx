@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-export type Foto = { file: string; caption: string };
+export type Foto = { file: string; caption: string; dir?: string };
 
 export const FOTOS_PASTO: Foto[] = [
   { file: "galeras.jpg", caption: "Volcán Galeras" },
@@ -9,6 +9,19 @@ export const FOTOS_PASTO: Foto[] = [
   { file: "cocha.jpg", caption: "Laguna de La Cocha" },
   { file: "carnaval.jpg", caption: "Carnaval de Negros y Blancos" },
   { file: "plaza.jpg", caption: "Alcaldía de Pasto" },
+];
+
+export const FOTOS_SEGURIDAD: Foto[] = [
+  { file: "monitoreo.jpg", caption: "Monitoreo 24/7", dir: "seguridad" },
+  { file: "patrulla.jpg", caption: "Patrullaje nocturno", dir: "seguridad" },
+];
+
+/** Para el login: seguridad y Pasto intercaladas. */
+export const FOTOS_PORTADA: Foto[] = [
+  FOTOS_SEGURIDAD[0],
+  FOTOS_PASTO[0],
+  FOTOS_SEGURIDAD[1],
+  ...FOTOS_PASTO.slice(1),
 ];
 
 type Credito = {
@@ -62,7 +75,7 @@ export function Carrusel({
       {ok.map((f, n) => (
         <img
           key={f.file}
-          src={`/pasto/${f.file}`}
+          src={`/${f.dir ?? "pasto"}/${f.file}`}
           alt={f.caption}
           className={n === i % ok.length ? "on" : ""}
           loading={n === 0 ? "eager" : "lazy"}

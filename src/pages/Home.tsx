@@ -4,7 +4,7 @@ import { api } from "../api/client";
 import type { DashboardStats, Heatmap, RankingRow, Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { Empty } from "../components/Art";
-import { Carrusel, FOTOS_PASTO } from "../components/Fotos";
+import { Carrusel, FOTOS_PASTO, FOTOS_SEGURIDAD } from "../components/Fotos";
 import { Franja, SolPastos } from "../components/Pasto";
 import BaseMap from "../components/BaseMap";
 import Icon, { type IconName } from "../components/Icon";
@@ -84,6 +84,8 @@ export default function Home() {
         </section>
       </div>
 
+      <Seguridad />
+
       <section>
         <div className="panel-head">
           <h3>Alertas recientes</h3>
@@ -146,6 +148,38 @@ export default function Home() {
   );
 }
 
+const SEGURIDAD = [
+  { foto: FOTOS_SEGURIDAD[0], icon: "shield" as IconName, title: "Vigilancia vecinal", text: "Cada reporte alerta a tu barrio al instante.", to: "/mapa", cta: "Ver mapa" },
+  { foto: FOTOS_SEGURIDAD[1], icon: "alert" as IconName, title: "Emergencias · 123", text: "Policía Nacional en Pasto, las 24 horas.", href: "tel:123", cta: "Llamar al 123" },
+];
+
+function Seguridad() {
+  return (
+    <section className="seguridad">
+      {SEGURIDAD.map((c) => (
+        <article key={c.title} className="seg-card">
+          <img src={`/${c.foto.dir}/${c.foto.file}`} alt={c.foto.caption} loading="lazy" />
+          <div className="seg-copy">
+            <span className="seg-icon">
+              <Icon name={c.icon} size={18} />
+            </span>
+            <b>{c.title}</b>
+            <small>{c.text}</small>
+            {c.href ? (
+              <a href={c.href} className="btn light small">
+                {c.cta}
+              </a>
+            ) : (
+              <Link to={c.to ?? "/mapa"} className="btn glass small">
+                {c.cta}
+              </Link>
+            )}
+          </div>
+        </article>
+      ))}
+    </section>
+  );
+}
 
 function Tile({
   icon,
