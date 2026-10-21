@@ -2,6 +2,7 @@
 import type {
   Connection,
   DailySummary,
+  DashboardStats,
   Heatmap,
   IncidentType,
   ModerationQueue,
@@ -56,6 +57,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     }
     throw new ApiError(res.status, message);
   }
+  if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
 
@@ -71,13 +73,16 @@ const qs = (params: Record<string, string | number | boolean | undefined | null>
 };
 
 export const api = {
-  hello: () => request<{ message: string; project: string; team: string[]; server_time: string }>("/api/v1/hello"),
+  hello: () => request<{ message: string; project: string; team: string[]; city?: string; server_time: string }>("/api/v1/hello"),
+  stats: () => request<DashboardStats>("/api/v1/stats"),
 
   // auth
   login: (email: string, password: string) => post<TokenResponse>("/api/v1/auth/login", { email, password }),
   register: (data: { full_name: string; email: string; password: string; phone?: string; neighborhood_id?: number | null }) =>
     post<TokenResponse>("/api/v1/auth/register", data),
   me: () => request<User>("/api/v1/auth/me"),
+  changePassword: (current_password: string, new_password: string) =>
+    request<void>("/api/v1/auth/change-password", { method: "POST", body: JSON.stringify({ current_password, new_password }) }),
 
   // catalogo
   neighborhoods: () => request<Neighborhood[]>("/api/v1/neighborhoods"),

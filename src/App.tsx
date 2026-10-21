@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
-import { Navigate, NavLink, Route, Routes } from "react-router-dom";
+import { useEffect, useState, type ReactNode } from "react";
+import { Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
 import AIPage from "./pages/AIPage";
-import { Login, Register } from "./pages/Auth";
+import { Account, Login, Register } from "./pages/Auth";
 import Feed, { MyReports } from "./pages/Feed";
 import Home from "./pages/Home";
 import MapPage from "./pages/MapPage";
@@ -11,6 +11,7 @@ import NewReport from "./pages/NewReport";
 import Notifications from "./pages/Notifications";
 import RoutePage from "./pages/RoutePage";
 import Structures from "./pages/Structures";
+import { CITY_NAME } from "./lib/format";
 
 function Private({ children, moderator = false }: { children: ReactNode; moderator?: boolean }) {
   const { user, loading, isModerator } = useAuth();
@@ -22,13 +23,26 @@ function Private({ children, moderator = false }: { children: ReactNode; moderat
 
 export default function App() {
   const { user, isModerator, signOut } = useAuth();
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
+  useEffect(() => setOpen(false), [location.pathname]);
+  const initials = user?.full_name.split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
+
   return (
     <>
-      <header className="topbar">
+      <header className={`topbar ${open ? "open" : ""}`}>
         <NavLink to="/" className="brand">
-          <img src="/favicon.svg" alt="" width={26} height={26} /> AlertaBarrio
+          <img src="/favicon.svg" alt="" width={30} height={30} />
+          <span>
+            AlertaBarrio
+            <small>{CITY_NAME}, Nariño</small>
+          </span>
         </NavLink>
+        <button className="menu-btn" aria-label="Abrir menú" aria-expanded={open} onClick={() => setOpen(!open)}>
+          {open ? "✕" : "☰"}
+        </button>
         <nav>
+          <NavLink to="/" end>Panel</NavLink>
           <NavLink to="/mapa">Mapa</NavLink>
           <NavLink to="/feed">Alertas</NavLink>
           {user && <NavLink to="/reportar">Reportar</NavLink>}
@@ -37,11 +51,15 @@ export default function App() {
           {isModerator && <NavLink to="/moderacion">Moderación</NavLink>}
           <NavLink to="/estructuras">Estructuras</NavLink>
         </nav>
-        <div className="row gap-s">
+        <div className="user">
           {user ? (
             <>
-              <NavLink to="/notificaciones" title="Notificaciones">🔔</NavLink>
-              <NavLink to="/mis-reportes" className="muted">{user.full_name.split(" ")[0]}</NavLink>
+              <NavLink to="/notificaciones" className="icon" title="Notificaciones">🔔</NavLink>
+              <NavLink to="/mis-reportes" title="Mis reportes" className="row gap-s">
+                <span className="avatar">{initials}</span>
+                <span>{user.full_name.split(" ")[0]}</span>
+              </NavLink>
+              <NavLink to="/cuenta" title="Seguridad de la cuenta">🔒</NavLink>
               <button className="btn small ghost" onClick={signOut}>Salir</button>
             </>
           ) : (
@@ -64,12 +82,13 @@ export default function App() {
           <Route path="/estructuras" element={<Structures />} />
           <Route path="/reportar" element={<Private><NewReport /></Private>} />
           <Route path="/mis-reportes" element={<Private><MyReports /></Private>} />
+          <Route path="/cuenta" element={<Private><Account /></Private>} />
           <Route path="/notificaciones" element={<Private><Notifications /></Private>} />
           <Route path="/moderacion" element={<Private moderator><Moderation /></Private>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      <footer className="footer muted">AlertaBarrio · Proyecto final de Estructuras de Datos</footer>
+      <footer className="footer muted">AlertaBarrio · {CITY_NAME}, Nariño · Proyecto final de Estructuras de Datos</footer>
     </>
   );
 }

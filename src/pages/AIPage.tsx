@@ -3,7 +3,7 @@ import { Circle } from "react-leaflet";
 import { api } from "../api/client";
 import BaseMap from "../components/BaseMap";
 import { Card, DSTag, ErrorBox, Loading } from "../components/ui";
-import { DAYS, HOUR_BLOCKS, pct } from "../lib/format";
+import { DAYS, HOUR_BLOCKS, heatRadius, pct } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 
 export default function AIPage() {
@@ -14,6 +14,8 @@ export default function AIPage() {
   const [hood, setHood] = useState<number>(1);
   const [refresh, setRefresh] = useState(0);
   const summary = useAsync(() => api.dailySummary(hood, refresh > 0), [hood, refresh]);
+
+  const radius = heatRadius(heat.data?.cells ?? []);
 
   // Matriz dia x franja para el barrio con mayor riesgo
   const top = heat.data?.hotspots[0];
@@ -49,8 +51,8 @@ export default function AIPage() {
                 <Circle
                   key={i}
                   center={[c.latitude, c.longitude]}
-                  radius={420}
-                  pathOptions={{ stroke: false, fillColor: c.intensity > 0.6 ? "#dc2626" : c.intensity > 0.3 ? "#f97316" : "#facc15", fillOpacity: 0.12 + c.intensity * 0.5 }}
+                  radius={radius}
+                  pathOptions={{ stroke: false, fillColor: c.intensity > 0.6 ? "#dc2626" : c.intensity > 0.3 ? "#f97316" : "#facc15", fillOpacity: 0.05 + c.intensity * 0.3 }}
                 />
               ))}
             </BaseMap>

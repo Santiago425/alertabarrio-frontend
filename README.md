@@ -96,7 +96,9 @@ PostgreSQL 16, **14 tablas** (nombres en inglés). Diagrama entidad-relación en
 
 `roles`, `users`, `neighborhoods`, `neighborhood_connections`, `incident_types`, `reports`, `report_photos`, `report_status_history`, `report_verifications`, `subscriptions`, `notifications`, `ai_analyses`, `daily_summaries`, `risk_hotspots`.
 
-Datos de ejemplo (`database/seed.sql`): 14 barrios de Bogotá, 8 usuarios y unos 150 reportes. Contraseña demo: `Alerta2026*`. El backend crea las tablas y carga los datos solo si la base está vacía.
+Datos de ejemplo (`database/seed.sql`): 14 barrios de **Pasto** (Centro, Pandiaco, Las Cuadras, Palermo, Torobajo, Anganoy, Mijitayo, Lorenzo de Aldana, Chapultepec, Obrero, Potrerillo, San Felipe, Santa Mónica y El Tejar), 8 usuarios y unos 150 reportes. Contraseña demo: `Alerta2026*`. El backend crea las tablas y carga los datos solo si la base está vacía; si encuentra una base vieja con barrios de Bogotá, la pasa a Pasto sin borrar usuarios ni reportes.
+
+**Contraseñas:** se guardan como hash **bcrypt** (costo 12, sal por usuario), se exige contraseña fuerte (8+ caracteres, mayúscula, minúscula, número y símbolo) y tras 5 intentos fallidos el correo queda bloqueado 10 minutos.
 
 ---
 
@@ -104,7 +106,8 @@ Datos de ejemplo (`database/seed.sql`): 14 barrios de Bogotá, 8 usuarios y unos
 
 | Ruta | Pantalla |
 |---|---|
-| `/` | Inicio: proyecto, integrantes y estado del backend (`/api/v1/hello`) |
+| `/` | **Panel (dashboard)**: estado de backend/BD/IA, indicadores, reportes por día y por tipo, mapa, últimas alertas, resumen de la IA y ranking de barrios |
+| `/cuenta` | Seguridad de la cuenta: cambiar contraseña |
 | `/registro`, `/login` | Registro e inicio de sesión (JWT) |
 | `/mapa` | Mapa en tiempo real con alertas coloreadas por gravedad + mapa de calor de la IA |
 | `/reportar` | Formulario rápido con ubicación en el mapa y foto opcional; muestra lo que hizo la IA |
@@ -123,7 +126,8 @@ Documentación interactiva (Swagger) en `/docs` del backend.
 
 | Método | Ruta | Estructura que usa |
 |---|---|---|
-| POST | `/api/v1/auth/register`, `/api/v1/auth/login` | — (bcrypt + JWT) |
+| POST | `/api/v1/auth/register`, `/api/v1/auth/login`, `/api/v1/auth/change-password` | — (bcrypt + JWT) |
+| GET | `/api/v1/stats` | números del dashboard |
 | POST | `/api/v1/reports` | IA → PriorityQueue + AVL + Stack |
 | GET | `/api/v1/feed?neighborhood_id=` | LinkedList / merge sort |
 | GET | `/api/v1/reports?from=&to=` | AVL (rango por fecha) |
