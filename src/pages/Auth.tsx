@@ -5,7 +5,7 @@ import { api, ApiError } from "../api/client";
 import type { User } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import Icon, { type IconName } from "../components/Icon";
-import { Carrusel, CreditosFotos, FOTOS_PASTO } from "../components/Fotos";
+import { Carrusel, CreditosFotos, FOTOS_PORTADA } from "../components/Fotos";
 import { Franja, SolPastos } from "../components/Pasto";
 import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
@@ -38,7 +38,7 @@ function AuthLayout({ children }: { children: ReactNode }) {
       <aside className="auth-show">
         <Franja className="show-franja" />
         <SolPastos size={300} tone="light" className="show-sol" />
-        <Carrusel fotos={FOTOS_PASTO} className="show-fotos" />
+        <Carrusel fotos={FOTOS_PORTADA} className="show-fotos" />
         <div className="show-copy">
           <h2>Tu barrio, más seguro entre todos.</h2>
           <p>AlertaBarrio conecta a los vecinos de {CITY_NAME} para avisar y prevenir incidentes.</p>

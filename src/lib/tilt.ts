@@ -1,4 +1,4 @@
-const TILT = ".tile, .recent-card, .show-fotos, .features li, .stat-panel";
+const TILT = ".tile, .recent-card, .show-fotos, .features li, .stat-panel, .seg-card";
 
 /** Inclina en 3D la tarjeta que esta bajo el mouse (solo con mouse y si el usuario acepta animaciones). */
 export function activarInclinacion(): void {
