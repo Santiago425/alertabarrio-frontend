@@ -702,3 +702,58 @@ body {
 .splash b { position: relative; font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.4rem; }
 .splash span { position: relative; color: var(--muted); font-size: 0.9rem; animation: fade 1.4s ease-in-out infinite; }
 @keyframes fade { 50% { opacity: 0.45; } }
+
+/* ============================================================ look profesional 3D */
+:root {
+  --glass: rgba(255, 253, 248, 0.86);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --depth: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 1px 2px rgba(45, 36, 20, 0.06), 0 10px 24px -6px rgba(45, 36, 20, 0.12), 0 28px 48px -20px rgba(19, 61, 48, 0.22);
+  --depth-hover: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 2px 4px rgba(45, 36, 20, 0.08), 0 18px 34px -8px rgba(45, 36, 20, 0.18), 0 40px 70px -24px rgba(19, 61, 48, 0.32);
+}
+/* foto de Pasto de fondo en toda la app */
+body {
+  background:
+    linear-gradient(180deg, rgba(246, 241, 231, 0.7) 0%, rgba(246, 241, 231, 0.86) 40%, rgba(246, 241, 231, 0.94) 100%),
+    url("/pasto/galeras.jpg") center top / cover no-repeat fixed,
+    var(--bg);
+}
+.panel, .card, .recent-card, .tile:not(.hot) {
+  background: var(--glass); border-color: var(--glass-border); box-shadow: var(--depth);
+  backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+.panel:hover, .tile:hover, .recent-card:hover { box-shadow: var(--depth-hover); border-color: rgba(199, 154, 44, 0.45); }
+.tile.hot { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 22px 44px -12px rgba(181, 69, 43, 0.55); }
+.tile, .recent-card, .show-fotos, .features li, .stat-panel {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0);
+  transform-style: preserve-3d; transition: transform 0.25s ease, box-shadow 0.25s, border-color 0.25s, background 0.25s;
+}
+.tilting { transition: transform 0.08s linear, box-shadow 0.25s, border-color 0.25s; }
+.tile:hover, .recent-card:hover { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px); }
+.tile-icon, .recent-icon { transform: translateZ(28px); box-shadow: 0 8px 16px -6px rgba(45, 36, 20, 0.25); }
+.tile-text b { transform: translateZ(18px); display: block; }
+.header { background: rgba(255, 253, 248, 0.72); box-shadow: 0 10px 30px -18px rgba(45, 36, 20, 0.35); }
+.btn { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 10px 22px -8px rgba(19, 61, 48, 0.55); }
+.btn:active { transform: translateY(1px) scale(0.99); }
+.sidebar { box-shadow: inset -1px 0 0 rgba(199, 154, 44, 0.35), 18px 0 40px -24px rgba(19, 61, 48, 0.5); }
+.side-link.active { box-shadow: inset 3px 0 0 var(--gold), 0 10px 22px -8px rgba(0, 0, 0, 0.35); }
+.dash-welcome { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 30px 60px -24px rgba(19, 61, 48, 0.6); }
+.dash-welcome .welcome-copy { text-shadow: 0 2px 14px rgba(0, 0, 0, 0.25); }
+.show-fotos { box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.1); }
+.auth-form { background: rgba(255, 253, 248, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.auth-show { box-shadow: 0 40px 80px -30px rgba(19, 61, 48, 0.7); }
+.carrusel figcaption b { font-size: 1.15rem; letter-spacing: -0.01em; }
+
+/* creditos de fotos */
+.auth-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.creditos-link { font-size: inherit; padding: 0; text-decoration: underline; text-underline-offset: 2px; }
+.side-creditos { color: rgba(243, 236, 217, 0.55) !important; font-size: 0.72rem; margin: 6px 12px 0; text-align: left; }
+.side-creditos:hover { color: #f3ecd9 !important; }
+.modal-back { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; background: rgba(20, 30, 25, 0.45); backdrop-filter: blur(6px); animation: rise 0.2s ease both; }
+.modal { width: min(520px, 100%); display: grid; gap: 14px; background: var(--surface); }
+.creditos { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.creditos li { display: grid; gap: 2px; font-size: 0.88rem; }
+.creditos a, .creditos span { color: var(--muted) !important; font-size: 0.8rem; word-break: break-word; }
+@media (prefers-reduced-motion: reduce) {
+  .tile, .recent-card, .show-fotos, .features li, .stat-panel { transform: none !important; }
+}
+.features li:hover { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-3px); }

@@ -5,7 +5,7 @@ import { api, ApiError } from "../api/client";
 import type { User } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import Icon, { type IconName } from "../components/Icon";
-import { Carrusel, FOTOS_PASTO } from "../components/Fotos";
+import { Carrusel, CreditosFotos, FOTOS_PASTO } from "../components/Fotos";
 import { Franja, SolPastos } from "../components/Pasto";
 import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
@@ -31,7 +31,9 @@ function AuthLayout({ children }: { children: ReactNode }) {
           <span>AlertaBarrio</span>
         </Link>
         <div className="auth-inner">{children}</div>
-        <small className="muted">© {new Date().getFullYear()} AlertaBarrio · {CITY_NAME}</small>
+        <small className="muted auth-foot">
+          © {new Date().getFullYear()} AlertaBarrio · {CITY_NAME} · <CreditosFotos />
+        </small>
       </section>
       <aside className="auth-show">
         <Franja className="show-franja" />

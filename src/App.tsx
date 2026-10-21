@@ -5,6 +5,7 @@ import { useAuth } from "./auth/AuthContext";
 import { AssistantFab } from "./components/Assistant";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Icon, { type IconName } from "./components/Icon";
+import { CreditosFotos } from "./components/Fotos";
 import Logo from "./components/Logo";
 import { Franja, SolPastos } from "./components/Pasto";
 import { CITY_NAME } from "./lib/format";
@@ -136,6 +137,7 @@ function Shell() {
             <Icon name="logout" />
             <span>Cerrar sesión</span>
           </button>
+          <CreditosFotos className="side-creditos" />
         </div>
       </aside>
       <div className="backdrop" onClick={() => setOpen(false)} />
