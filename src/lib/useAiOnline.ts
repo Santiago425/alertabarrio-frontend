@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
-import { api } from "../api/client";
+import { API_URL, api } from "../api/client";
 
 export type AiState = "waking" | "on" | "off";
 
 let state: AiState = "waking";
 let waiting: Promise<AiState> | null = null;
+
+// Render solo despierta el servicio de IA con visitas de afuera, asi que el navegador tambien lo toca
+const AI_URL = (import.meta.env.VITE_AI_URL ?? API_URL.replace("alertabarrio-api", "alertabarrio-ai")).replace(/\/$/, "");
+const pingAi = () => {
+  if (AI_URL !== API_URL) fetch(`${AI_URL}/api/v1/models`, { mode: "no-cors" }).catch(() => undefined);
+};
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -12,6 +18,7 @@ function waitForAi(): Promise<AiState> {
   if (state === "on") return Promise.resolve(state);
   waiting ??= (async () => {
     for (let i = 0; i < 30; i++) {
+      if (i % 4 === 0) pingAi();
       try {
         if ((await api.aiStatus()).available) return (state = "on");
       } catch {
