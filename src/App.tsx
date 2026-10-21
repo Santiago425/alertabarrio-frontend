@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Icon, { type IconName } from "./components/Icon";
 import Logo from "./components/Logo";
 import { CITY_NAME } from "./lib/format";
+import { useAiOnline } from "./lib/useAiOnline";
 import { useAsync } from "./lib/useAsync";
 import AIPage from "./pages/AIPage";
 import { Account, Login, Register } from "./pages/Auth";
@@ -73,6 +74,7 @@ function Shell() {
   const { user, isModerator, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  useAiOnline();
   useEffect(() => {
     setOpen(false);
   }, [location.pathname]);

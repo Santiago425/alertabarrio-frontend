@@ -5,16 +5,18 @@ import AssistantChat from "../components/Assistant";
 import BaseMap from "../components/BaseMap";
 import { Card, DSTag, ErrorBox, Loading } from "../components/ui";
 import { DAYS, HOUR_BLOCKS, heatRadius, pct } from "../lib/format";
+import { useAiOnline } from "../lib/useAiOnline";
 import { useAsync } from "../lib/useAsync";
 
 export default function AIPage() {
-  const heat = useAsync(() => api.heatmap(), []);
-  const status = useAsync(() => api.aiStatus(), []);
+  const ai = useAiOnline();
+  const aiOnline = ai === "on";
+  const heat = useAsync(() => api.heatmap(), [ai]);
   const ranking = useAsync(() => api.ranking(), []);
   const neighborhoods = useAsync(() => api.neighborhoods(), []);
   const [hood, setHood] = useState<number>(1);
   const [refresh, setRefresh] = useState(0);
-  const summary = useAsync(() => api.dailySummary(hood, refresh > 0), [hood, refresh]);
+  const summary = useAsync(() => api.dailySummary(hood, refresh > 0), [hood, refresh, ai]);
 
   const radius = heatRadius(heat.data?.cells ?? []);
 
@@ -29,10 +31,10 @@ export default function AIPage() {
       <AssistantChat />
 
       <div className="toolbar left">
-        {status.data?.available ? (
-          <span className="pill-ai">● IA en línea</span>
-        ) : (
-          <span className="badge status-rejected">IA sin conexión</span>
+        {ai !== "off" && (
+          <span className={`live ${ai}`}>
+            <i /> {aiOnline ? "IA en línea" : "Activando IA…"}
+          </span>
         )}
       </div>
 
@@ -53,7 +55,7 @@ export default function AIPage() {
               ))}
             </BaseMap>
             <ul>
-              {heat.data?.insights?.map((s) => (
+              {heat.data?.available && heat.data.insights?.map((s) => (
                 <li key={s}>{s}</li>
               ))}
             </ul>
@@ -128,7 +130,7 @@ export default function AIPage() {
           </>
         }
       >
-        {summary.loading ? <Loading text="Generando…" /> : <p className="summary">{summary.data?.summary_text}</p>}
+        {summary.loading || (ai === "waking" && summary.data?.available === false) ? <Loading text="Generando…" /> : <p className="summary">{summary.data?.summary_text}</p>}
       </Card>
     </div>
   );
