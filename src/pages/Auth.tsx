@@ -5,20 +5,21 @@ import { api, ApiError } from "../api/client";
 import type { User } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import Icon, { type IconName } from "../components/Icon";
-import { Carrusel, CreditosFotos, FOTOS_PORTADA } from "../components/Fotos";
-import { Franja, SolPastos } from "../components/Pasto";
+import { Carousel, PhotoCredits, COVER_PHOTOS } from "../components/Photos";
+import { Stripe, SunEmblem } from "../components/Decor";
 import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
-import { CITY_NAME, timeAgo } from "../lib/format";
+import { timeAgo } from "../lib/format";
+import { ASSISTANT_NAME, CITY_NAME } from "../config";
 import { PASSWORD_RULES, passwordBytes, passwordStrength } from "../lib/password";
 import { useAsync } from "../lib/useAsync";
 
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
-  { icon: "plus", title: "Reporta incidentes", text: "Robos, riñas o daños con ubicación exacta." },
+  { icon: "mic", title: "Reporta hablando", text: `Cuéntale a ${ASSISTANT_NAME} qué pasó y él arma el reporte.` },
   { icon: "map", title: "Mapa en vivo", text: "Mira las alertas de la ciudad en tiempo real." },
   { icon: "bell", title: "Alertas de tu barrio", text: "Recibe avisos de los barrios que sigues." },
-  { icon: "sparkles", title: "Asistente con IA", text: "Pregunta qué zonas evitar y a qué hora." },
-  { icon: "route", title: "Ruta segura", text: "Encuentra el camino con menos riesgo." },
+  { icon: "sparkles", title: ASSISTANT_NAME, text: "Tu asistente: pregunta qué zonas evitar y a qué hora." },
+  { icon: "route", title: "Ruta segura", text: "Dile a dónde vas y te da el camino con menos riesgo." },
   { icon: "shield", title: "Alertas verificadas", text: "Moderadores confirman cada reporte." },
 ];
 
@@ -32,13 +33,13 @@ function AuthLayout({ children }: { children: ReactNode }) {
         </Link>
         <div className="auth-inner">{children}</div>
         <small className="muted auth-foot">
-          © {new Date().getFullYear()} AlertaBarrio · {CITY_NAME} · <CreditosFotos />
+          © {new Date().getFullYear()} AlertaBarrio · {CITY_NAME} · <PhotoCredits />
         </small>
       </section>
       <aside className="auth-show">
-        <Franja className="show-franja" />
-        <SolPastos size={300} tone="light" className="show-sol" />
-        <Carrusel fotos={FOTOS_PORTADA} className="show-fotos" />
+        <Stripe className="show-stripe" />
+        <SunEmblem size={300} tone="light" className="show-sun" />
+        <Carousel photos={COVER_PHOTOS} className="show-photos" />
         <div className="show-copy">
           <h2>Tu barrio, más seguro entre todos.</h2>
           <p>AlertaBarrio conecta a los vecinos de {CITY_NAME} para avisar y prevenir incidentes.</p>

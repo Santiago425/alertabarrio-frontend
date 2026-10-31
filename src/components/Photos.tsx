@@ -1,64 +1,63 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-export type Foto = { file: string; caption: string; dir?: string };
+export type Photo = { file: string; caption: string; dir?: string };
 
-export const FOTOS_PASTO: Foto[] = [
-  { file: "galeras.jpg", caption: "Volcán Galeras" },
-  { file: "catedral.jpg", caption: "Catedral de Pasto" },
-  { file: "cocha.jpg", caption: "Laguna de La Cocha" },
-  { file: "carnaval.jpg", caption: "Carnaval de Negros y Blancos" },
-  { file: "plaza.jpg", caption: "Alcaldía de Pasto" },
+export const CITY_PHOTOS: Photo[] = [
+  { file: "volcano.jpg", caption: "Volcán Galeras" },
+  { file: "cathedral.jpg", caption: "Catedral" },
+  { file: "lagoon.jpg", caption: "Laguna de La Cocha" },
+  { file: "city-hall.jpg", caption: "Alcaldía" },
 ];
 
-export const FOTOS_SEGURIDAD: Foto[] = [
-  { file: "monitoreo.jpg", caption: "Monitoreo 24/7", dir: "seguridad" },
-  { file: "patrulla.jpg", caption: "Patrullaje nocturno", dir: "seguridad" },
+export const SECURITY_PHOTOS: Photo[] = [
+  { file: "monitoring.jpg", caption: "Monitoreo 24/7", dir: "security" },
+  { file: "patrol.jpg", caption: "Patrullaje nocturno", dir: "security" },
 ];
 
-/** Para el login: seguridad y Pasto intercaladas. */
-export const FOTOS_PORTADA: Foto[] = [
-  FOTOS_SEGURIDAD[0],
-  FOTOS_PASTO[0],
-  FOTOS_SEGURIDAD[1],
-  ...FOTOS_PASTO.slice(1),
+/** Para el login: fotos de seguridad y de la ciudad intercaladas. */
+export const COVER_PHOTOS: Photo[] = [
+  SECURITY_PHOTOS[0],
+  CITY_PHOTOS[0],
+  SECURITY_PHOTOS[1],
+  ...CITY_PHOTOS.slice(1),
 ];
 
-type Credito = {
+type Credit = {
   file: string;
   author: string;
   license: string;
   source: string;
 };
-let creditos: Promise<Credito[]> | null = null;
+let credits: Promise<Credit[]> | null = null;
 
-function loadCreditos(): Promise<Credito[]> {
-  creditos ??= fetch("/pasto/creditos.json")
+function loadCredits(): Promise<Credit[]> {
+  credits ??= fetch("/photos/credits.json")
     .then((r) => (r.ok ? r.text() : "[]"))
-    .then((t) => JSON.parse(t.replace(/^﻿/, "")) as Credito[])
+    .then((t) => JSON.parse(t.replace(/^﻿/, "")) as Credit[])
     .catch(() => []);
-  return creditos;
+  return credits;
 }
 
-function useCreditos() {
-  const [list, setList] = useState<Credito[]>([]);
+function useCredits() {
+  const [list, setList] = useState<Credit[]>([]);
   useEffect(() => {
-    loadCreditos().then(setList);
+    loadCredits().then(setList);
   }, []);
   return list;
 }
 
 /** Fotos reales que se van turnando con un fundido suave. */
-export function Carrusel({
-  fotos,
+export function Carousel({
+  photos,
   className = "",
   every = 6000,
 }: {
-  fotos: Foto[];
+  photos: Photo[];
   className?: string;
   every?: number;
 }) {
-  const [ok, setOk] = useState<Foto[]>(fotos);
+  const [ok, setOk] = useState<Photo[]>(photos);
   const [i, setI] = useState(0);
 
   useEffect(() => {
@@ -71,11 +70,11 @@ export function Carrusel({
   const now = ok[i % ok.length];
 
   return (
-    <figure className={`carrusel ${className}`}>
+    <figure className={`carousel ${className}`}>
       {ok.map((f, n) => (
         <img
           key={f.file}
-          src={`/${f.dir ?? "pasto"}/${f.file}`}
+          src={`/${f.dir ?? "photos"}/${f.file}`}
           alt={f.caption}
           className={n === i % ok.length ? "on" : ""}
           loading={n === 0 ? "eager" : "lazy"}
@@ -90,14 +89,14 @@ export function Carrusel({
 }
 
 /** Enlace discreto con los autores y licencias de las fotos (lo pide la licencia CC BY-SA). */
-export function CreditosFotos({ className = "" }: { className?: string }) {
+export function PhotoCredits({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState(false);
-  const cred = useCreditos();
+  const cred = useCredits();
   return (
     <>
       <button
         type="button"
-        className={`link-btn creditos-link ${className}`}
+        className={`link-btn credits-link ${className}`}
         onClick={() => setOpen(true)}
       >
         Créditos de fotos
@@ -112,8 +111,8 @@ export function CreditosFotos({ className = "" }: { className?: string }) {
               onClick={(e) => e.stopPropagation()}
             >
               <h3>Créditos de fotos</h3>
-              <ul className="creditos">
-                {FOTOS_PASTO.map((f) => {
+              <ul className="credits">
+                {CITY_PHOTOS.map((f) => {
                   const c = cred.find((x) => x.file === f.file);
                   return (
                     <li key={f.file}>

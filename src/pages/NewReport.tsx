@@ -4,10 +4,11 @@ import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import type { ReportCreated } from "../api/types";
 import { ShieldArt } from "../components/Art";
-import BaseMap from "../components/BaseMap";
+import BaseMap, { FlyTo } from "../components/BaseMap";
 import Icon from "../components/Icon";
-import { Card, DSTag, ErrorBox, TypeBadge } from "../components/ui";
+import { Card, ErrorBox, TypeBadge } from "../components/ui";
 import { pct } from "../lib/format";
+import { currentPosition } from "../lib/geo";
 import { useAsync } from "../lib/useAsync";
 
 function ClickToPlace({ onPick }: { onPick: (lat: number, lng: number) => void }) {
@@ -15,28 +16,46 @@ function ClickToPlace({ onPick }: { onPick: (lat: number, lng: number) => void }
   return null;
 }
 
+/** Formulario clasico para reportar (alternativa a contarselo a Vigia). */
 export default function NewReport() {
   const neighborhoods = useAsync(() => api.neighborhoods(), []);
   const types = useAsync(() => api.incidentTypes(), []);
   const [form, setForm] = useState({ title: "", description: "", incident_type_id: "", neighborhood_id: "", photo_url: "" });
   const [point, setPoint] = useState<[number, number] | null>(null);
+  const [target, setTarget] = useState<[number, number, number] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<ReportCreated | null>(null);
 
   const set = (k: keyof typeof form) => (e: { target: { value: string } }) => {
-    setForm({ ...form, [k]: e.target.value });
-    if (k === "neighborhood_id" && !point) {
+    setForm((f) => ({ ...f, [k]: e.target.value }));
+    // elegir el barrio mueve el punto al barrio, para que mapa y barrio siempre coincidan
+    if (k === "neighborhood_id") {
       const n = neighborhoods.data?.find((x) => x.id === Number(e.target.value));
-      if (n) setPoint([n.latitude, n.longitude]);
+      if (n) {
+        setPoint([n.latitude, n.longitude]);
+        setTarget([n.latitude, n.longitude, 15]);
+      }
     }
   };
 
-  const useMyLocation = () =>
-    navigator.geolocation?.getCurrentPosition(
-      (pos) => setPoint([pos.coords.latitude, pos.coords.longitude]),
-      () => setError("No pudimos obtener tu ubicación"),
-    );
+  // marcar un punto en el mapa elige solo el barrio al que pertenece
+  const placeAt = async (lat: number, lng: number) => {
+    setPoint([lat, lng]);
+    try {
+      const n = await api.nearestNeighborhood(lat, lng);
+      setForm((f) => ({ ...f, neighborhood_id: String(n.id) }));
+    } catch {
+      /* si falla, el vecino elige el barrio a mano */
+    }
+  };
+
+  const useMyLocation = async () => {
+    const pos = await currentPosition();
+    if (!pos) return setError("No pudimos obtener tu ubicación. Revisa el permiso de ubicación.");
+    setTarget([pos[0], pos[1], 16]);
+    placeAt(pos[0], pos[1]);
+  };
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -86,9 +105,9 @@ export default function NewReport() {
             </li>
             <li>
               Entró a la <b>cola de prioridad</b> de moderación con prioridad <b>{report.priority_score}</b>: está en la posición{" "}
-              <b>{result.queue_position}</b> de {result.queue_size}. <DSTag>PriorityQueue (max-heap)</DSTag>
+              <b>{result.queue_position}</b> de {result.queue_size}.
             </li>
-            <li>Cuando un moderador lo publique, se notificará a los vecinos suscritos al barrio. <DSTag>Queue FIFO</DSTag></li>
+            <li>Cuando un moderador lo publique, se notificará a los vecinos suscritos al barrio.</li>
           </ol>
         </Card>
         <div className="row gap-s">
@@ -124,7 +143,7 @@ export default function NewReport() {
           </select>
         </label>
         <label>
-          Barrio
+          Barrio <small className="muted">(sale solo del punto en el mapa)</small>
           <select value={form.neighborhood_id} onChange={set("neighborhood_id")} required>
             <option value="">— Elegir —</option>
             {neighborhoods.data?.map((n) => (
@@ -145,13 +164,14 @@ export default function NewReport() {
       </form>
       <div className="stack-s">
         <div className="row space">
-          <p className="muted">Toca el mapa para marcar dónde ocurrió.</p>
+          <p className="muted">Toca el mapa donde ocurrió.</p>
           <button type="button" className="btn small ghost" onClick={useMyLocation}>
             <Icon name="pin" size={14} /> Usar mi ubicación
           </button>
         </div>
         <BaseMap height={520}>
-          <ClickToPlace onPick={(lat, lng) => setPoint([lat, lng])} />
+          <ClickToPlace onPick={placeAt} />
+          <FlyTo target={target} />
           {point && <CircleMarker center={point} radius={10} pathOptions={{ color: "#dc2626", fillOpacity: 0.7 }} />}
         </BaseMap>
       </div>

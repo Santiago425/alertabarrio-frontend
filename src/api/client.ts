@@ -1,4 +1,5 @@
 // Cliente HTTP: todas las llamadas al backend pasan por aqui.
+import { API_URL } from "../config";
 import type {
   Connection,
   DailySummary,
@@ -11,15 +12,17 @@ import type {
   RankingRow,
   Report,
   ReportCreated,
+  ReportDraft,
   SafeRoute,
   StatusEntry,
   Subscription,
   TokenResponse,
   UndoResult,
   User,
+  VoiceRoute,
 } from "./types";
 
-export const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
+export { API_URL };
 const TOKEN_KEY = "alertabarrio_token";
 
 export const tokenStore = {
@@ -91,6 +94,7 @@ export const api = {
   neighborhoods: () => request<Neighborhood[]>("/api/v1/neighborhoods"),
   connections: () => request<Connection[]>("/api/v1/neighborhoods/connections"),
   ranking: () => request<RankingRow[]>("/api/v1/neighborhoods/ranking"),
+  nearestNeighborhood: (lat: number, lng: number) => request<Neighborhood>(`/api/v1/neighborhoods/nearest${qs({ lat, lng })}`),
   incidentTypes: () => request<IncidentType[]>("/api/v1/incident-types"),
 
   createReport: (data: unknown) => post<ReportCreated>("/api/v1/reports", data),
@@ -119,6 +123,10 @@ export const api = {
   heatmap: (days = 120) => request<Heatmap>(`/api/v1/ai/heatmap${qs({ days })}`),
   chat: (question: string, neighborhoodId?: number | null, history: { role: "user" | "assistant"; text: string }[] = []) =>
     post<{ available: boolean; answer: string; model: string }>("/api/v1/ai/chat", { question, neighborhood_id: neighborhoodId ?? null, history }),
+  reportDraft: (text: string, point: [number, number] | null) =>
+    post<ReportDraft>("/api/v1/ai/report-draft", { text, latitude: point?.[0] ?? null, longitude: point?.[1] ?? null }),
+  voiceRoute: (text: string, point: [number, number] | null) =>
+    post<VoiceRoute>("/api/v1/ai/route", { text, latitude: point?.[0] ?? null, longitude: point?.[1] ?? null }),
   dailySummary: (neighborhoodId: number, refresh = false) =>
     request<DailySummary>(`/api/v1/ai/daily-summary${qs({ neighborhood_id: neighborhoodId, refresh })}`),
 

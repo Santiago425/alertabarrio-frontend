@@ -2,7 +2,7 @@ import { useState } from "react";
 import { api } from "../api/client";
 import type { StatusEntry } from "../api/types";
 import ReportCard from "../components/ReportCard";
-import { Card, DSTag, ErrorBox, HeapTree, Loading, StackView } from "../components/ui";
+import { Card, ErrorBox, HeapTree, Loading, StackView } from "../components/ui";
 import { STATUS_LABEL } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 
@@ -59,7 +59,7 @@ export default function Moderation() {
 
       <div className="two-col">
         <Card
-          title={<>Cola de prioridad ({queue.data?.size ?? 0}) <DSTag>max-heap</DSTag></>}
+          title={<>Reportes por revisar ({queue.data?.size ?? 0})</>}
           actions={
             <button className="btn" onClick={takeNext} disabled={!queue.data?.size}>
               Tomar el siguiente más grave
@@ -83,7 +83,7 @@ export default function Moderation() {
           </ol>
         </Card>
 
-        <Card title={<>Pila del último deshacer <DSTag>Stack</DSTag></>}>
+        <Card title={<>Último cambio (para deshacer)</>}>
           {lastStack ? (
             <>
               <p className="muted">Reporte #{lastStack.id}</p>

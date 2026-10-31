@@ -1,5 +1,5 @@
 import { api } from "../api/client";
-import { Card, DSTag, ErrorBox } from "../components/ui";
+import { Card, ErrorBox } from "../components/ui";
 import { timeAgo } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 
@@ -22,7 +22,7 @@ export default function Notifications() {
 
   return (
     <div className="two-col">
-      <Card title={<>Notificaciones <DSTag>salen de una Queue FIFO</DSTag></>}>
+      <Card title={<>Notificaciones</>}>
         <ErrorBox message={notes.error} />
         {notes.data?.length === 0 && <p className="muted">No tienes notificaciones.</p>}
         <ul className="notes">
