@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
-import { CITY_NAME } from "../lib/format";
+import { CITY_NAME } from "../config";
 import Icon from "./Icon";
 
 interface Message {

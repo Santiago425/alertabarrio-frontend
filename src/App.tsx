@@ -5,13 +5,13 @@ import { useAuth } from "./auth/AuthContext";
 import { AssistantFab } from "./components/Assistant";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Icon, { type IconName } from "./components/Icon";
-import { CreditosFotos } from "./components/Fotos";
+import { PhotoCredits } from "./components/Photos";
 import Logo from "./components/Logo";
-import { Franja, SolPastos } from "./components/Pasto";
-import { CITY_NAME } from "./lib/format";
+import { Stripe, SunEmblem } from "./components/Decor";
+import { CITY_NAME, CITY_REGION } from "./config";
 import { useAiOnline } from "./lib/useAiOnline";
 import { useAsync } from "./lib/useAsync";
-import AIPage from "./pages/AIPage";
+import AIPage from "./pages/VigiaPage";
 import { Account, Login, Register } from "./pages/Auth";
 import Feed, { MyReports } from "./pages/Feed";
 import Home from "./pages/Home";
@@ -20,7 +20,7 @@ import Moderation from "./pages/Moderation";
 import NewReport from "./pages/NewReport";
 import Notifications from "./pages/Notifications";
 import RoutePage from "./pages/RoutePage";
-import Structures from "./pages/Structures";
+import Structures from "./pages/Docs";
 
 const TITLES: Record<string, string> = {
   "/": "Panel",
@@ -61,7 +61,7 @@ export default function App() {
   if (loading)
     return (
       <div className="splash">
-        <SolPastos size={120} />
+        <SunEmblem size={120} />
         <Logo size={52} />
         <b>AlertaBarrio</b>
         <span>Conectando con el servidor…</span>
@@ -98,15 +98,15 @@ function Shell() {
   return (
     <div className={`shell ${open ? "menu-open" : ""}`}>
       <aside className="sidebar">
-        <SolPastos size={230} tone="light" className="side-sol" />
+        <SunEmblem size={230} tone="light" className="side-sun" />
         <Link to="/" className="side-brand">
           <Logo size={36} />
           <span>
             AlertaBarrio
-            <small>{CITY_NAME}, Nariño</small>
+            <small>{CITY_NAME}, {CITY_REGION}</small>
           </span>
         </Link>
-        <Franja className="side-franja" height={10} />
+        <Stripe className="side-stripe" height={10} />
 
         <nav className="side-nav">
           <NavItem to="/" end icon="home" label="Panel" />
@@ -137,7 +137,7 @@ function Shell() {
             <Icon name="logout" />
             <span>Cerrar sesión</span>
           </button>
-          <CreditosFotos className="side-creditos" />
+          <PhotoCredits className="side-credits" />
         </div>
       </aside>
       <div className="backdrop" onClick={() => setOpen(false)} />

@@ -5,11 +5,12 @@ import { api, ApiError } from "../api/client";
 import type { User } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import Icon, { type IconName } from "../components/Icon";
-import { Carrusel, CreditosFotos, FOTOS_PORTADA } from "../components/Fotos";
-import { Franja, SolPastos } from "../components/Pasto";
+import { Carousel, PhotoCredits, COVER_PHOTOS } from "../components/Photos";
+import { Stripe, SunEmblem } from "../components/Decor";
 import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
-import { CITY_NAME, timeAgo } from "../lib/format";
+import { timeAgo } from "../lib/format";
+import { CITY_NAME } from "../config";
 import { PASSWORD_RULES, passwordBytes, passwordStrength } from "../lib/password";
 import { useAsync } from "../lib/useAsync";
 
@@ -32,13 +33,13 @@ function AuthLayout({ children }: { children: ReactNode }) {
         </Link>
         <div className="auth-inner">{children}</div>
         <small className="muted auth-foot">
-          © {new Date().getFullYear()} AlertaBarrio · {CITY_NAME} · <CreditosFotos />
+          © {new Date().getFullYear()} AlertaBarrio · {CITY_NAME} · <PhotoCredits />
         </small>
       </section>
       <aside className="auth-show">
-        <Franja className="show-franja" />
-        <SolPastos size={300} tone="light" className="show-sol" />
-        <Carrusel fotos={FOTOS_PORTADA} className="show-fotos" />
+        <Stripe className="show-stripe" />
+        <SunEmblem size={300} tone="light" className="show-sun" />
+        <Carousel photos={COVER_PHOTOS} className="show-photos" />
         <div className="show-copy">
           <h2>Tu barrio, más seguro entre todos.</h2>
           <p>AlertaBarrio conecta a los vecinos de {CITY_NAME} para avisar y prevenir incidentes.</p>

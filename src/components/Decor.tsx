@@ -1,12 +1,12 @@
 import { useId } from "react";
 
-/** Sol de los Pastos: estrella de ocho puntas de la orfebreria y ceramica de los Pastos. */
-export function SolPastos({ size = 120, className = "", tone = "gold" }: { size?: number; className?: string; tone?: "gold" | "light" | "terra" }) {
+/** Emblema: estrella de ocho puntas que gira despacio (logo de fondo). */
+export function SunEmblem({ size = 120, className = "", tone = "gold" }: { size?: number; className?: string; tone?: "gold" | "light" | "terra" }) {
   const c = TONES[tone];
   const rays = Array.from({ length: 8 }, (_, i) => i * 45);
   return (
-    <svg width={size} height={size} viewBox="-50 -50 100 100" className={`sol-pastos ${className}`} aria-hidden="true">
-      <g className="sol-rays">
+    <svg width={size} height={size} viewBox="-50 -50 100 100" className={`sun-emblem ${className}`} aria-hidden="true">
+      <g className="sun-rays">
         {rays.map((a, i) => (
           <path key={a} d="M0-47 L7-30 L0-18 L-7-30Z" transform={`rotate(${a})`} fill={i % 2 ? c.b : c.a} />
         ))}
@@ -28,11 +28,11 @@ const TONES = {
   terra: { a: "#b5452b", b: "#1f5f4a", core: "#c79a2c" },
 };
 
-/** Franja con rombos escalonados y dientes, al estilo del barniz de Pasto (mopa-mopa). */
-export function Franja({ className = "", height = 14 }: { className?: string; height?: number }) {
+/** Franja decorativa con rombos escalonados y dientes. */
+export function Stripe({ className = "", height = 14 }: { className?: string; height?: number }) {
   const id = useId().replace(/:/g, "");
   return (
-    <svg className={`franja ${className}`} width="100%" height={height} preserveAspectRatio="none" aria-hidden="true">
+    <svg className={`stripe ${className}`} width="100%" height={height} preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <pattern id={`fr${id}`} width="36" height="14" patternUnits="userSpaceOnUse">
           <rect width="36" height="14" fill="#1f1c17" />

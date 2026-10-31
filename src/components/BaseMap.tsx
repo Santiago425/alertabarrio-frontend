@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
-import { CITY_CENTER, CITY_ZOOM } from "../lib/format";
+import { CITY_CENTER, CITY_ZOOM } from "../config";
 
 export default function BaseMap({ children, height = 480, zoom = CITY_ZOOM }: { children?: ReactNode; height?: number; zoom?: number }) {
   return (

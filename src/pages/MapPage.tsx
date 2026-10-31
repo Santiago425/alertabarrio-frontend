@@ -7,7 +7,8 @@ import type { Heatmap, Report } from "../api/types";
 import BaseMap from "../components/BaseMap";
 import Icon from "../components/Icon";
 import { ErrorBox, StatusBadge } from "../components/ui";
-import { CITY_CENTER, CITY_ZOOM, heatRadius, timeAgo } from "../lib/format";
+import { heatRadius, timeAgo } from "../lib/format";
+import { CITY_CENTER, CITY_ZOOM } from "../config";
 import { useAsync } from "../lib/useAsync";
 
 const RANGES = [

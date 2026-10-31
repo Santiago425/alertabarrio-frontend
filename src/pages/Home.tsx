@@ -4,11 +4,12 @@ import { api } from "../api/client";
 import type { DashboardStats, Heatmap, RankingRow, Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { Empty } from "../components/Art";
-import { Carrusel, FOTOS_PASTO, FOTOS_SEGURIDAD } from "../components/Fotos";
-import { Franja, SolPastos } from "../components/Pasto";
+import { Carousel, CITY_PHOTOS, SECURITY_PHOTOS } from "../components/Photos";
+import { Stripe, SunEmblem } from "../components/Decor";
 import BaseMap from "../components/BaseMap";
 import Icon, { type IconName } from "../components/Icon";
-import { CITY_NAME, DAYS, greeting, longDate, timeAgo } from "../lib/format";
+import { DAYS, greeting, longDate, timeAgo } from "../lib/format";
+import { CITY_NAME } from "../config";
 import { useAiOnline } from "../lib/useAiOnline";
 import { useAsync } from "../lib/useAsync";
 import { useCountUp } from "../lib/useCountUp";
@@ -29,7 +30,7 @@ export default function Home() {
   return (
     <div className="dash">
       <div className="dash-welcome">
-        <SolPastos size={260} tone="light" className="welcome-sol" />
+        <SunEmblem size={260} tone="light" className="welcome-sun" />
         <div className="welcome-copy">
           <h2>
             {greeting()}
@@ -47,8 +48,8 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <Carrusel fotos={FOTOS_PASTO} className="welcome-fotos" every={7000} />
-        <Franja className="welcome-franja" height={12} />
+        <Carousel photos={CITY_PHOTOS} className="welcome-photos" every={7000} />
+        <Stripe className="welcome-stripe" height={12} />
         {ai !== "off" && (
           <span className={`live ${ai}`}>
             <i /> {aiOnline ? "IA en línea" : "Activando IA…"}
@@ -149,8 +150,8 @@ export default function Home() {
 }
 
 const SEGURIDAD = [
-  { foto: FOTOS_SEGURIDAD[0], icon: "shield" as IconName, title: "Vigilancia vecinal", text: "Cada reporte alerta a tu barrio al instante.", to: "/mapa", cta: "Ver mapa" },
-  { foto: FOTOS_SEGURIDAD[1], icon: "alert" as IconName, title: "Emergencias · 123", text: "Policía Nacional en Pasto, las 24 horas.", href: "tel:123", cta: "Llamar al 123" },
+  { foto: SECURITY_PHOTOS[0], icon: "shield" as IconName, title: "Vigilancia vecinal", text: "Cada reporte alerta a tu barrio al instante.", to: "/mapa", cta: "Ver mapa" },
+  { foto: SECURITY_PHOTOS[1], icon: "alert" as IconName, title: "Emergencias · 123", text: `Policía Nacional en ${CITY_NAME}, las 24 horas.`, href: "tel:123", cta: "Llamar al 123" },
 ];
 
 function Seguridad() {

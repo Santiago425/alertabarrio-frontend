@@ -1,7 +1,7 @@
-/** Ilustracion de Pasto: volcan Galeras, la ciudad y alertas sobre el mapa. */
+/** Ilustracion de la ciudad: volcan, edificios y alertas sobre el mapa. */
 export function CityArt({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 600 340" className={`city-art ${className}`} role="img" aria-label="Ilustración de Pasto con el volcán Galeras">
+    <svg viewBox="0 0 600 340" className={`city-art ${className}`} role="img" aria-label="Ilustración de la ciudad con alertas">
       <g className="art-sun">
         <circle cx="470" cy="70" r="34" fill="#fff" opacity=".9" />
         <circle cx="470" cy="70" r="52" fill="#fff" opacity=".15" />

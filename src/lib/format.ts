@@ -11,9 +11,6 @@ export const STATUS_LABEL: Record<ReportStatus, string> = {
 export const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 export const HOUR_BLOCKS = ["00:00–06:00", "06:00–12:00", "12:00–18:00", "18:00–24:00"];
 
-export const CITY_NAME = "Pasto";
-export const CITY_CENTER: [number, number] = [1.2125, -77.2805];
-export const CITY_ZOOM = 14;
 
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleString("es-CO", {

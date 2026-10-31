@@ -1,4 +1,5 @@
 // Cliente HTTP: todas las llamadas al backend pasan por aqui.
+import { API_URL } from "../config";
 import type {
   Connection,
   DailySummary,
@@ -19,7 +20,7 @@ import type {
   User,
 } from "./types";
 
-export const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
+export { API_URL };
 const TOKEN_KEY = "alertabarrio_token";
 
 export const tokenStore = {
