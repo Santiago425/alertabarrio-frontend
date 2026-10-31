@@ -12,6 +12,26 @@ El proyecto está dividido en **tres repositorios** que trabajan juntos:
 | [alertabarrio-backend](https://github.com/Santiago425/alertabarrio-backend) | API REST, base de datos y **todas las estructuras de datos** | Python + FastAPI + PostgreSQL |
 | [alertabarrio-ai](https://github.com/Santiago425/alertabarrio-ai) | Componente de IA independiente | Python + FastAPI |
 
+## Cuentas de prueba
+
+| Correo | Clave | Entrar como |
+|---|---|---|
+| `ana@alertabarrio.co` | `Alerta2026*` | Usuario |
+| `moderador@alertabarrio.co` | `Alerta2026*` | Administrador |
+| `admin@alertabarrio.co` | `Alerta2026*` | Administrador |
+
+## Vigía: todo se puede hacer hablando
+
+- **Reportar:** "hay unos tipos sospechosos rondando en Torobajo" → Vigía arma el reporte con tu ubicación y lo publicas con un toque.
+- **Ruta segura:** "estoy en la universidad, necesito ir al centro" → sale desde tu ubicación y evita los barrios con alertas.
+- **Preguntar:** "¿qué barrio debo evitar hoy?".
+
+La voz usa el reconocimiento del navegador (Chrome, Edge, Safari y Android); si no está disponible se puede escribir.
+
+## Variables de entorno
+
+Nada queda fijo en el código: todo sale de `src/config.ts`, que lee las variables `VITE_*` (ver `.env.example`): URL del backend y de la IA, ciudad, centro del mapa y nombre del asistente.
+
 ---
 
 ## 1. Arquitectura
@@ -37,7 +57,7 @@ El proyecto está dividido en **tres repositorios** que trabajan juntos:
 
 ## 2. ¿Qué pasa cuando un vecino reporta algo?
 
-1. El vecino llena el formulario en `/reportar` (tipo de incidente, descripción, ubicación en el mapa y foto opcional).
+1. El vecino **se lo cuenta a Vigía** (el asistente) por voz o texto en `/alertas`: "robaron un celular en la Avenida Santander". La IA saca el tipo de incidente, el título y la descripción, y el barrio sale de la **ubicación del celular**. El vecino solo revisa y publica (foto opcional). El formulario clásico sigue disponible como alternativa, y ahí el barrio también se elige solo al marcar el punto en el mapa.
 2. El backend guarda el reporte con estado `created` y lo mete en la **pila** de historial de ese reporte.
 3. El backend le manda el texto a la **IA**, que responde:
    - qué tipo de incidente cree que es (clasificador **Naive Bayes**) y con qué confianza,

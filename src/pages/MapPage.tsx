@@ -1,10 +1,10 @@
 import L from "leaflet";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Circle, Marker, Popup, useMap } from "react-leaflet";
+import { Circle, Marker, Popup } from "react-leaflet";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import type { Heatmap, Report } from "../api/types";
-import BaseMap from "../components/BaseMap";
+import BaseMap, { FlyTo } from "../components/BaseMap";
 import Icon from "../components/Icon";
 import { ErrorBox, StatusBadge } from "../components/ui";
 import { heatRadius, timeAgo } from "../lib/format";
@@ -32,14 +32,6 @@ function markerIcon(r: Report, selected: boolean) {
     popupAnchor: [0, -size / 2],
     html: `<span class="pin${recent ? " recent" : ""}${selected ? " selected" : ""}" style="--c:${r.incident_type.color};width:${size}px;height:${size}px"></span>`,
   });
-}
-
-function FlyTo({ target }: { target: [number, number, number] | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (target) map.flyTo([target[0], target[1]], target[2], { duration: 0.8 });
-  }, [map, target]);
-  return null;
 }
 
 export default function MapPage() {
@@ -181,7 +173,7 @@ export default function MapPage() {
                     <p>{r.description}</p>
                     <div className="pop-foot">
                       <StatusBadge status={r.status} />
-                      <Link to="/feed">Ver en alertas</Link>
+                      <Link to="/alertas">Ver en alertas</Link>
                     </div>
                   </div>
                 </Popup>

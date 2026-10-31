@@ -10,16 +10,16 @@ import { Stripe, SunEmblem } from "../components/Decor";
 import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
 import { timeAgo } from "../lib/format";
-import { CITY_NAME } from "../config";
+import { ASSISTANT_NAME, CITY_NAME } from "../config";
 import { PASSWORD_RULES, passwordBytes, passwordStrength } from "../lib/password";
 import { useAsync } from "../lib/useAsync";
 
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
-  { icon: "plus", title: "Reporta incidentes", text: "Robos, riñas o daños con ubicación exacta." },
+  { icon: "mic", title: "Reporta hablando", text: `Cuéntale a ${ASSISTANT_NAME} qué pasó y él arma el reporte.` },
   { icon: "map", title: "Mapa en vivo", text: "Mira las alertas de la ciudad en tiempo real." },
   { icon: "bell", title: "Alertas de tu barrio", text: "Recibe avisos de los barrios que sigues." },
-  { icon: "sparkles", title: "Asistente con IA", text: "Pregunta qué zonas evitar y a qué hora." },
-  { icon: "route", title: "Ruta segura", text: "Encuentra el camino con menos riesgo." },
+  { icon: "sparkles", title: ASSISTANT_NAME, text: "Tu asistente: pregunta qué zonas evitar y a qué hora." },
+  { icon: "route", title: "Ruta segura", text: "Dile a dónde vas y te da el camino con menos riesgo." },
   { icon: "shield", title: "Alertas verificadas", text: "Moderadores confirman cada reporte." },
 ];
 

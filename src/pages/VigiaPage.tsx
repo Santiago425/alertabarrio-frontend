@@ -3,12 +3,13 @@ import { Circle } from "react-leaflet";
 import { api } from "../api/client";
 import AssistantChat from "../components/Assistant";
 import BaseMap from "../components/BaseMap";
-import { Card, DSTag, ErrorBox, Loading } from "../components/ui";
+import { Card, ErrorBox, Loading } from "../components/ui";
 import { DAYS, HOUR_BLOCKS, heatRadius, pct } from "../lib/format";
 import { useAiOnline } from "../lib/useAiOnline";
 import { useAsync } from "../lib/useAsync";
+import { ASSISTANT_NAME } from "../config";
 
-export default function AIPage() {
+export default function VigiaPage() {
   const ai = useAiOnline();
   const aiOnline = ai === "on";
   const heat = useAsync(() => api.heatmap(), [ai]);
@@ -33,7 +34,7 @@ export default function AIPage() {
       <div className="toolbar left">
         {ai !== "off" && (
           <span className={`live ${ai}`}>
-            <i /> {aiOnline ? "IA en línea" : "Activando IA…"}
+            <i /> {aiOnline ? `${ASSISTANT_NAME} en línea` : `Activando ${ASSISTANT_NAME}…`}
           </span>
         )}
       </div>
@@ -89,7 +90,7 @@ export default function AIPage() {
           </table>
         </Card>
 
-        <Card title={<>Barrios con más alertas activas <DSTag>quick sort</DSTag></>}>
+        <Card title={<>Barrios con más alertas activas</>}>
           <table className="table">
             <thead>
               <tr>

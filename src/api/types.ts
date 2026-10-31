@@ -182,3 +182,25 @@ export interface DashboardStats {
   timeline: { date: string; count: number }[];
   by_type: { code: string; name: string; color: string; count: number }[];
 }
+
+export interface ReportDraft {
+  available: boolean;
+  model: string;
+  message: string;
+  incident_type: IncidentType | null;
+  neighborhood: Neighborhood | null;
+  title: string;
+  description: string;
+  place: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  location_source: "gps" | "texto" | "perfil" | null;
+}
+
+export interface VoiceRoute {
+  available: boolean;
+  model: string;
+  message: string;
+  origin_source: "gps" | "texto" | "perfil" | null;
+  route: SafeRoute | null;
+}

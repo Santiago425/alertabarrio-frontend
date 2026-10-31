@@ -9,7 +9,7 @@ import { Stripe, SunEmblem } from "../components/Decor";
 import BaseMap from "../components/BaseMap";
 import Icon, { type IconName } from "../components/Icon";
 import { DAYS, greeting, longDate, timeAgo } from "../lib/format";
-import { CITY_NAME } from "../config";
+import { ASSISTANT_NAME, CITY_NAME } from "../config";
 import { useAiOnline } from "../lib/useAiOnline";
 import { useAsync } from "../lib/useAsync";
 import { useCountUp } from "../lib/useCountUp";
@@ -40,8 +40,8 @@ export default function Home() {
             {longDate()} · {CITY_NAME}
           </p>
           <div className="welcome-actions">
-            <Link to="/reportar" className="btn light">
-              <Icon name="plus" size={16} /> Reportar incidente
+            <Link to="/alertas" className="btn light">
+              <Icon name="mic" size={16} /> Reportar hablando
             </Link>
             <Link to="/mapa" className="btn glass">
               <Icon name="map" size={16} /> Ver mapa
@@ -52,7 +52,7 @@ export default function Home() {
         <Stripe className="welcome-stripe" height={12} />
         {ai !== "off" && (
           <span className={`live ${ai}`}>
-            <i /> {aiOnline ? "IA en línea" : "Activando IA…"}
+            <i /> {aiOnline ? `${ASSISTANT_NAME} en línea` : `Activando ${ASSISTANT_NAME}…`}
           </span>
         )}
       </div>
@@ -61,11 +61,11 @@ export default function Home() {
 
       <div className="dash-top">
         <div className="tiles">
-          <Tile tone="hot" icon="alert" title="Alertas activas" value={s?.active_alerts} sub={s ? `${s.by_status.verified} verificadas` : ""} to="/feed" />
+          <Tile tone="hot" icon="alert" title="Alertas activas" value={s?.active_alerts} sub={s ? `${s.by_status.verified} verificadas` : ""} to="/alertas" />
           {isModerator ? (
             <Tile icon="shield" title="Por moderar" value={s?.pending_moderation} sub="en la cola" to="/moderacion" tint="#f59e0b" />
           ) : (
-            <Tile icon="check" title="Verificadas" value={s?.by_status.verified} sub="confirmadas por vecinos" to="/feed" tint="#2c7458" />
+            <Tile icon="check" title="Verificadas" value={s?.by_status.verified} sub="confirmadas por vecinos" to="/alertas" tint="#2c7458" />
           )}
           <Tile
             icon="chart"
@@ -73,7 +73,7 @@ export default function Home() {
             value={s?.this_week}
             sub={change === null ? "reportes" : `${change > 0 ? "▲" : "▼"} ${Math.abs(change)}% vs. anterior`}
             tint="#c79a2c"
-            to="/ia"
+            to="/vigia"
           />
         </div>
         <section className="panel stat-panel">
@@ -90,7 +90,7 @@ export default function Home() {
       <section>
         <div className="panel-head">
           <h3>Alertas recientes</h3>
-          <Link to="/feed" className="tag link">Ver todas</Link>
+          <Link to="/alertas" className="tag link">Ver todas</Link>
         </div>
         {feed.data ? <RecentCards reports={latest(feed.data)} /> : <Skeleton lines={3} />}
       </section>
@@ -272,7 +272,7 @@ function RecentCards({ reports }: { reports: Report[] }) {
         const confirmations = r.confirmations ?? (r.status === "verified" ? 2 : 0);
         const progress = Math.min(100, (confirmations / 2) * 100);
         return (
-          <Link to="/feed" key={r.id} className="recent-card">
+          <Link to="/alertas" key={r.id} className="recent-card">
             <div className="recent-top">
               <span className="recent-icon" style={{ background: `${r.incident_type.color}1c`, color: r.incident_type.color }}>
                 <Icon name="alert" size={20} />

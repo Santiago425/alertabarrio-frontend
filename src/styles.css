@@ -770,3 +770,61 @@ body {
 .seg-copy small { color: rgba(255, 255, 255, 0.85); margin-bottom: 8px; }
 .seg-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--grad-terra); color: #fff; box-shadow: 0 6px 16px rgba(181, 69, 43, 0.4); margin-bottom: 4px; }
 @media (max-width: 760px) { .seguridad { grid-template-columns: 1fr; } .seg-copy { max-width: 100%; } }
+
+/* ============================================================ Vigía: hablar para reportar o pedir ruta */
+.voice-report { display: flex; flex-direction: column; gap: 14px; }
+.voice-report-head { display: flex; align-items: center; gap: 14px; }
+.voice-report-head h2 { margin: 0; font-size: 1.2rem; }
+.voice-report-head p { margin: 2px 0 0; }
+.voice-report-head .assistant-logo { width: 46px; height: 46px; border-radius: 14px; color: #fff; flex: none; }
+.voice-input { position: relative; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; }
+.voice-input input { flex: 1; min-width: 0; border-radius: 12px; }
+.voice-input .btn { padding: 10px 14px; border-radius: 12px; }
+.voice-input.big input { padding: 14px 16px; font-size: 1rem; }
+.voice-input.big .btn { padding: 14px 18px; }
+.mic-btn {
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--grad-terra); color: #fff; box-shadow: 0 8px 20px rgba(181, 69, 43, 0.3); transition: transform 0.15s;
+}
+.voice-input.big .mic-btn { width: 54px; height: 54px; }
+.mic-btn:hover { transform: scale(1.06); }
+.mic-btn:disabled { opacity: 0.5; cursor: default; }
+.voice-input.listening .mic-btn { animation: mic-pulse 1.1s ease-out infinite; }
+@keyframes mic-pulse { 0% { box-shadow: 0 0 0 0 rgba(181, 69, 43, 0.55); } 100% { box-shadow: 0 0 0 16px rgba(181, 69, 43, 0); } }
+.voice-error { flex-basis: 100%; color: #b91c1c; }
+.voice-said { margin: 0; padding: 10px 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); }
+.form-link, .back-link { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 0; }
+.section-title { margin: 6px 0 0; font-size: 1.1rem; }
+
+.draft { display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); white-space: normal; color: var(--text); }
+.bubble .draft { margin-top: 10px; }
+.draft-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.draft-where { display: inline-flex; align-items: center; gap: 4px; font-weight: 650; font-size: 0.88rem; }
+.draft-where small { color: var(--muted); font-weight: 500; }
+.draft-title { font-size: 1rem; }
+.draft-text { margin: 0; color: var(--text-2); }
+.draft-photo { font-size: 0.86rem; }
+.draft.done { flex-direction: row; align-items: flex-start; gap: 10px; border-color: rgba(22, 163, 74, 0.4); background: var(--green-soft); }
+.draft.done svg { color: var(--green); flex: none; margin-top: 2px; }
+.draft.done small { display: block; color: var(--text-2); margin-top: 2px; }
+.bubble .btn { margin-top: 8px; }
+.assistant-input .voice-input { flex: 1; }
+
+/* documentacion */
+.docs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.doc-card { display: flex; flex-direction: column; gap: 6px; }
+.doc-card h3 { margin: 0; font-size: 1.02rem; }
+.doc-card p { margin: 0; font-size: 0.92rem; }
+.doc-card code { margin-top: auto; padding-top: 6px; font-size: 0.74rem; color: var(--primary-dark); white-space: normal; }
+
+/* tarjetas del panel: contenido centrado, sin espacio vacio */
+.tile { flex-direction: column; justify-content: center; text-align: center; gap: 10px; }
+.tile-text { align-items: center; }
+.tile-text small { white-space: normal; }
+
+/* en celular el menu lateral se abre encima (el "sticky" de arriba lo dejaba ocupando la primera pantalla) */
+@media (max-width: 1024px) {
+  .sidebar { position: fixed; }
+  .voice-report-head .assistant-logo { display: none; }
+  .bubble { max-width: 94%; }
+}
