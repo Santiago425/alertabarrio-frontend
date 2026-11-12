@@ -5,7 +5,7 @@ import type { DashboardStats, Heatmap, RankingRow, Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { Empty } from "../components/Art";
 import { Carousel, CITY_PHOTOS, SECURITY_PHOTOS } from "../components/Photos";
-import { Stripe, SunEmblem } from "../components/Decor";
+import { SunEmblem } from "../components/Decor";
 import BaseMap from "../components/BaseMap";
 import Icon, { type IconName } from "../components/Icon";
 import { DAYS, greeting, longDate, timeAgo } from "../lib/format";
@@ -49,7 +49,6 @@ export default function Home() {
           </div>
         </div>
         <Carousel photos={CITY_PHOTOS} className="welcome-photos" every={7000} />
-        <Stripe className="welcome-stripe" height={12} />
         {ai !== "off" && (
           <span className={`live ${ai}`}>
             <i /> {aiOnline ? `${ASSISTANT_NAME} en línea` : `Activando ${ASSISTANT_NAME}…`}

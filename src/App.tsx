@@ -7,7 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Icon, { type IconName } from "./components/Icon";
 import { PhotoCredits } from "./components/Photos";
 import Logo from "./components/Logo";
-import { Stripe, SunEmblem } from "./components/Decor";
+import { SunEmblem } from "./components/Decor";
 import { ASSISTANT_NAME, CITY_NAME, CITY_REGION, PROFESOR_EMAIL } from "./config";
 import { useAiOnline } from "./lib/useAiOnline";
 import { useAsync } from "./lib/useAsync";
@@ -107,7 +107,6 @@ function Shell() {
             <small>{CITY_NAME}, {CITY_REGION}</small>
           </span>
         </Link>
-        <Stripe className="side-stripe" height={10} />
 
         <nav className="side-nav">
           <NavItem to="/" end icon="home" label="Panel" />
