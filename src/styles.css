@@ -858,3 +858,11 @@ body {
 @media (max-width: 960px) {
   .show-stripe { width: calc(100% - 44px) !important; }
 }
+
+/* login: tarjeta con la cuenta del profesor */
+.profe-card { margin-top: 22px; padding: 16px; border-radius: 16px; border: 1px dashed rgba(199, 154, 44, 0.7); background: rgba(199, 154, 44, 0.08); display: flex; flex-direction: column; gap: 12px; }
+.profe-head { display: flex; align-items: center; gap: 10px; }
+.profe-head .f-icon { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: var(--primary-dark); color: #fff; flex: none; }
+.profe-card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 0.92rem; }
+.profe-card dt { color: var(--muted); }
+.profe-card dd { margin: 0; font-weight: 700; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; user-select: all; word-break: break-all; }

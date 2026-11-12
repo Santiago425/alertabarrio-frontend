@@ -18,3 +18,8 @@ export const CITY_ZOOM = Number(env.VITE_CITY_ZOOM ?? 14);
 
 // Nombre del asistente de IA
 export const ASSISTANT_NAME = env.VITE_ASSISTANT_NAME ?? "Vigía";
+
+// Cuenta de revision del profesor: se muestra en el login con un boton para entrar directo.
+// La clave debe ser la misma que PROFESOR_PASSWORD en el backend (Render).
+export const PROFESOR_EMAIL = env.VITE_PROFESOR_EMAIL ?? "profesor@alertabarrio.co";
+export const PROFESOR_PASSWORD = env.VITE_PROFESOR_PASSWORD ?? "Profe2026";

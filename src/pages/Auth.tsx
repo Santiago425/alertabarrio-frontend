@@ -10,7 +10,7 @@ import { Stripe, SunEmblem } from "../components/Decor";
 import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
 import { timeAgo } from "../lib/format";
-import { ASSISTANT_NAME, CITY_NAME } from "../config";
+import { ASSISTANT_NAME, CITY_NAME, PROFESOR_EMAIL, PROFESOR_PASSWORD } from "../config";
 import { PASSWORD_RULES, passwordBytes, passwordStrength } from "../lib/password";
 import { useAsync } from "../lib/useAsync";
 
@@ -135,10 +135,14 @@ export function Login() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    await enter(email, password, kind);
+  };
+
+  const enter = async (mail: string, pass: string, as: "user" | "admin") => {
     setBusy(true);
     setError(null);
     try {
-      const resp = await api.login(email, password, kind, needsOtp ? otp : undefined);
+      const resp = await api.login(mail, pass, as, needsOtp ? otp : undefined);
       signIn(resp);
       navigate(resp.user.role === "citizen" ? "/" : "/moderacion");
     } catch (err) {
@@ -232,6 +236,33 @@ export function Login() {
         <p className="auth-switch">
           ¿No tienes cuenta? <Link to="/registro">Regístrate gratis</Link>
         </p>
+      )}
+      {PROFESOR_PASSWORD && (
+        <div className="profe-card">
+          <div className="profe-head">
+            <span className="f-icon"><Icon name="shield" size={16} /></span>
+            <b>Acceso para el profesor</b>
+          </div>
+          <dl>
+            <dt>Correo</dt>
+            <dd>{PROFESOR_EMAIL}</dd>
+            <dt>Contraseña</dt>
+            <dd>{PROFESOR_PASSWORD}</dd>
+          </dl>
+          <button
+            type="button"
+            className="btn ghost block"
+            disabled={busy}
+            onClick={() => {
+              setKind("admin");
+              setEmail(PROFESOR_EMAIL);
+              setPassword(PROFESOR_PASSWORD);
+              void enter(PROFESOR_EMAIL, PROFESOR_PASSWORD, "admin");
+            }}
+          >
+            Entrar como profesor
+          </button>
+        </div>
       )}
     </AuthLayout>
   );
