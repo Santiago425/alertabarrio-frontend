@@ -23,9 +23,9 @@ export function SunEmblem({ size = 120, className = "", tone = "gold" }: { size?
 }
 
 const TONES = {
-  gold: { a: "#c79a2c", b: "#b5452b", core: "#1f5f4a" },
-  light: { a: "#f3ecd9", b: "#e2c26f", core: "#b5452b" },
-  terra: { a: "#b5452b", b: "#1f5f4a", core: "#c79a2c" },
+  gold: { a: "#2563eb", b: "#60a5fa", core: "#1e40af" },
+  light: { a: "#e5e7eb", b: "#93c5fd", core: "#60a5fa" },
+  terra: { a: "#0b0d12", b: "#2563eb", core: "#60a5fa" },
 };
 
 /** Franja decorativa con rombos escalonados y dientes. */
@@ -35,13 +35,13 @@ export function Stripe({ className = "", height = 14 }: { className?: string; he
     <svg className={`stripe ${className}`} width="100%" height={height} preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <pattern id={`fr${id}`} width="36" height="14" patternUnits="userSpaceOnUse">
-          <rect width="36" height="14" fill="#1f1c17" />
-          <path d="M0 0h6l-3 3.5Z M12 0h6l-3 3.5Z M24 0h6l-3 3.5Z" fill="#b5452b" />
-          <path d="M6 14h6l-3-3.5Z M18 14h6l-3-3.5Z M30 14h6l-3-3.5Z" fill="#2c7458" />
-          <path d="M18 2.5 22.5 7 18 11.5 13.5 7Z" fill="#c79a2c" />
-          <path d="M18 5 20 7 18 9 16 7Z" fill="#1f1c17" />
-          <rect x="3" y="6" width="3" height="2" fill="#f3ecd9" />
-          <rect x="30" y="6" width="3" height="2" fill="#f3ecd9" />
+          <rect width="36" height="14" fill="#0b0d12" />
+          <path d="M0 0h6l-3 3.5Z M12 0h6l-3 3.5Z M24 0h6l-3 3.5Z" fill="#e11d48" />
+          <path d="M6 14h6l-3-3.5Z M18 14h6l-3-3.5Z M30 14h6l-3-3.5Z" fill="#3b82f6" />
+          <path d="M18 2.5 22.5 7 18 11.5 13.5 7Z" fill="#2563eb" />
+          <path d="M18 5 20 7 18 9 16 7Z" fill="#0b0d12" />
+          <rect x="3" y="6" width="3" height="2" fill="#e5e7eb" />
+          <rect x="30" y="6" width="3" height="2" fill="#e5e7eb" />
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill={`url(#fr${id})`} />
