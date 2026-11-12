@@ -6,13 +6,14 @@ import type { User } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import Icon, { type IconName } from "../components/Icon";
 import { Carousel, PhotoCredits, COVER_PHOTOS } from "../components/Photos";
-import { Stripe, SunEmblem } from "../components/Decor";
+import { SunEmblem } from "../components/Decor";
 import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
 import { timeAgo } from "../lib/format";
 import { ASSISTANT_NAME, CITY_NAME, PROFESOR_EMAIL, PROFESOR_PASSWORD } from "../config";
 import { PASSWORD_RULES, passwordBytes, passwordStrength } from "../lib/password";
 import { useAsync } from "../lib/useAsync";
+import NightScene from "../components/NightScene";
 
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: "mic", title: "Reporta hablando", text: `Cuéntale a ${ASSISTANT_NAME} qué pasó y él arma el reporte.` },
@@ -26,6 +27,7 @@ const FEATURES: { icon: IconName; title: string; text: string }[] = [
 function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="auth">
+      <NightScene />
       <section className="auth-form">
         <Link to="/" className="auth-logo">
           <Logo size={38} />
@@ -37,7 +39,9 @@ function AuthLayout({ children }: { children: ReactNode }) {
         </small>
       </section>
       <aside className="auth-show">
-        <Stripe className="show-stripe" />
+        <div className="show-floor" aria-hidden="true" />
+        <div className="show-orb o1" aria-hidden="true" />
+        <div className="show-orb o2" aria-hidden="true" />
         <SunEmblem size={300} tone="light" className="show-sun" />
         <div className="show-inner">
           <Carousel photos={COVER_PHOTOS} className="show-photos" />
