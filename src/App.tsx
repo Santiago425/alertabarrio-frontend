@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Icon, { type IconName } from "./components/Icon";
 import { PhotoCredits } from "./components/Photos";
 import Logo from "./components/Logo";
+import NightScene from "./components/NightScene";
 import { SunEmblem } from "./components/Decor";
 import { ASSISTANT_NAME, CITY_NAME, CITY_REGION, PROFESOR_EMAIL } from "./config";
 import { useAiOnline } from "./lib/useAiOnline";
@@ -141,6 +142,7 @@ function Shell() {
       </aside>
       <div className="backdrop" onClick={() => setOpen(false)} />
 
+      <NightScene />
       <div className="main">
         <header className="header">
           <button className="icon-btn menu-btn" aria-label="Abrir menú" onClick={() => setOpen(true)}>

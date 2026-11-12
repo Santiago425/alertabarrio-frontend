@@ -1077,12 +1077,8 @@ input:focus, select:focus, textarea:focus,
 .fab { background: var(--grad-blue) !important; box-shadow: 0 12px 28px -12px rgba(37, 99, 235, 0.8) !important; }
 
 /* ============================================================ fondo: Pasto de noche */
-.auth {
-  background:
-    linear-gradient(180deg, rgba(5, 7, 13, 0.15), rgba(5, 7, 13, 0.05) 60%, rgba(5, 7, 13, 0.25)),
-    url("/photos/night.svg") center bottom / cover no-repeat fixed,
-    #05070d !important;
-}
+.auth { background: transparent !important; position: relative; }
+.auth > :not(.night-scene) { position: relative; z-index: 1; }
 .auth-form {
   background: rgba(255, 255, 255, 0.94) !important;
   margin: 16px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.6);
@@ -1095,3 +1091,32 @@ input:focus, select:focus, textarea:focus,
 }
 .features li { background: rgba(11, 13, 18, 0.55) !important; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 @media (max-width: 960px) { .auth-form { margin: 0; border-radius: 0; } }
+
+/* ============================================================ fondo de toda la app: Pasto de noche */
+.main { background: transparent; position: relative; z-index: 1; }
+body { background: #05070d !important; }
+.night-scene { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: #05070d; --mx: 0; --my: 0; }
+.night-layer {
+  position: absolute; inset: -6%; background-size: cover; background-position: center bottom; background-repeat: no-repeat;
+  transform: translate3d(calc(var(--mx) * var(--d) * -1px), calc(var(--my) * var(--d) * -0.6px), 0) scale(1.02);
+  will-change: transform;
+}
+.night-sky { animation: twinkle 6s ease-in-out infinite alternate; }
+@keyframes twinkle { to { filter: brightness(1.25); } }
+.night-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 7, 13, 0.5) 0%, rgba(5, 7, 13, 0.25) 50%, rgba(5, 7, 13, 0.1) 100%); }
+.sidebar { position: sticky; z-index: 2; }
+.panel, .card, .recent-card, .tile:not(.hot), .report { background: #fff !important; }
+.content { color: #fff; }
+.panel, .card, .report, .recent-card, .tile:not(.hot), .stat-panel, .profe-card, .leaflet-container, .assistant, .modal { color: var(--text); }
+.content > .muted, .content .page-head .muted { color: rgba(255, 255, 255, 0.7); }
+.header { background: rgba(11, 13, 18, 0.55) !important; border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important; box-shadow: none !important; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.header h1 { color: #fff !important; }
+.header .icon-btn, .header .user-pill { background: rgba(255, 255, 255, 0.08) !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #fff; }
+.header .user-pill b, .header .user-pill strong, .header .user-pill span { color: #fff; }
+.header .menu-btn { color: #fff; background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.12); }
+.content > section > .panel-head h3,
+.content > .page-head h2, .content > .page-head p,
+.content > h2, .content > h3, .content > p, .content > .muted,
+.content > section > h2, .content > section > h3 { color: #fff; }
+.content > .page-head .muted, .content > p.muted { color: rgba(255, 255, 255, 0.7); }
+.header .icon-btn, .header .icon-btn svg, .header .menu-btn svg { color: #fff !important; }

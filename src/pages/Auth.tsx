@@ -13,6 +13,7 @@ import { timeAgo } from "../lib/format";
 import { ASSISTANT_NAME, CITY_NAME, PROFESOR_EMAIL, PROFESOR_PASSWORD } from "../config";
 import { PASSWORD_RULES, passwordBytes, passwordStrength } from "../lib/password";
 import { useAsync } from "../lib/useAsync";
+import NightScene from "../components/NightScene";
 
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: "mic", title: "Reporta hablando", text: `Cuéntale a ${ASSISTANT_NAME} qué pasó y él arma el reporte.` },
@@ -26,6 +27,7 @@ const FEATURES: { icon: IconName; title: string; text: string }[] = [
 function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="auth">
+      <NightScene />
       <section className="auth-form">
         <Link to="/" className="auth-logo">
           <Logo size={38} />
