@@ -1,3 +1,5 @@
+import "../components/address.css";
+import HoodOptions from "../components/HoodOptions";
 import { api } from "../api/client";
 import { Card, ErrorBox } from "../components/ui";
 import { timeAgo } from "../lib/format";
@@ -40,14 +42,18 @@ export default function Notifications() {
         </ul>
       </Card>
       <Card title="Barrios que sigo">
+        {subs.data?.length === 0 && <p className="muted">Todavía no sigues ningún barrio.</p>}
         <div className="chips">
-          {neighborhoods.data?.map((n) => (
-            <button key={n.id} className={`chip ${subscribed.has(n.id) ? "on" : ""}`} onClick={() => toggle(n.id)}>
-              {subscribed.has(n.id) ? "✓ " : "+ "}
-              {n.name}
+          {subs.data?.map((s) => (
+            <button key={s.neighborhood.id} className="chip on" onClick={() => toggle(s.neighborhood.id)} title="Dejar de seguir">
+              ✓ {s.neighborhood.name} ✕
             </button>
           ))}
         </div>
+        <select className="hood-add" value="" onChange={(e) => e.target.value && toggle(Number(e.target.value))} aria-label="Seguir otro barrio">
+          <option value="">+ Seguir otro barrio de Pasto…</option>
+          <HoodOptions hoods={neighborhoods.data?.filter((n) => !subscribed.has(n.id))} />
+        </select>
       </Card>
     </div>
   );

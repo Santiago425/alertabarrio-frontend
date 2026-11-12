@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import HoodOptions from "./HoodOptions";
 import { api } from "../api/client";
 import type { ReportCreated, ReportDraft } from "../api/types";
 import { useAsync } from "../lib/useAsync";
@@ -88,9 +89,7 @@ export default function DraftCard({ draft, onCancel }: { draft: ReportDraft; onC
             </select>
             <select value={form.neighborhood_id} onChange={(e) => setForm({ ...form, neighborhood_id: Number(e.target.value) })} aria-label="Barrio">
               <option value={0}>Barrio…</option>
-              {neighborhoods.data?.map((n) => (
-                <option key={n.id} value={n.id}>{n.name}</option>
-              ))}
+<HoodOptions hoods={neighborhoods.data} />
             </select>
           </div>
         </div>

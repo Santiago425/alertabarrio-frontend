@@ -1,4 +1,5 @@
 import { useState } from "react";
+import HoodOptions from "../components/HoodOptions";
 import { api } from "../api/client";
 import type { Report } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
@@ -23,11 +24,7 @@ export default function Feed() {
       <div className="toolbar">
         <select value={hood ?? ""} onChange={(e) => setHood(e.target.value ? Number(e.target.value) : undefined)}>
           <option value="">Toda la ciudad</option>
-          {neighborhoods.data?.map((n) => (
-            <option key={n.id} value={n.id}>
-              {n.name}
-            </option>
-          ))}
+          <HoodOptions hoods={neighborhoods.data} />
         </select>
       </div>
 

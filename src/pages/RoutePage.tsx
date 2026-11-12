@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { CircleMarker, Polyline, Tooltip } from "react-leaflet";
 import { useSearchParams } from "react-router-dom";
+import HoodOptions from "../components/HoodOptions";
 import { api } from "../api/client";
 import type { SafeRoute } from "../api/types";
 import BaseMap from "../components/BaseMap";
@@ -86,15 +87,11 @@ export default function RoutePage() {
       <div className="row gap-s wrap">
         <select value={from} onChange={(e) => setFrom(e.target.value)}>
           <option value="">Desde…</option>
-          {neighborhoods.data?.map((n) => (
-            <option key={n.id} value={n.id}>{n.name}</option>
-          ))}
+<HoodOptions hoods={neighborhoods.data} />
         </select>
         <select value={to} onChange={(e) => setTo(e.target.value)}>
           <option value="">Hasta…</option>
-          {neighborhoods.data?.map((n) => (
-            <option key={n.id} value={n.id}>{n.name}</option>
-          ))}
+<HoodOptions hoods={neighborhoods.data} />
         </select>
         <button className="btn" disabled={!from || !to || from === to} onClick={() => calc()}>
           Calcular
@@ -130,7 +127,7 @@ export default function RoutePage() {
             <CircleMarker
               key={n.id}
               center={[n.latitude, n.longitude]}
-              radius={8 + (s / maxSev) * 12}
+              radius={s ? 8 + (s / maxSev) * 12 : 4}
               pathOptions={{ color: "#fff", weight: 2, fillColor: s ? "#dc2626" : "#2563eb", fillOpacity: 0.25 + (s / maxSev) * 0.6 }}
             >
               <Tooltip>

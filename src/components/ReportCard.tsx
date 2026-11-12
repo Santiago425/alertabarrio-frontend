@@ -44,7 +44,9 @@ export default function ReportCard({ report, onChanged, actions }: Props) {
           <span className="badge">Prioridad {report.priority_score}</span>
         </div>
         <small className="muted">
-          {report.neighborhood.name} · {timeAgo(report.occurred_at)}
+          {report.neighborhood.name}
+          {report.neighborhood.comuna ? ` (comuna ${report.neighborhood.comuna})` : ""}
+          {report.address ? ` · ${report.address}` : ""} · {timeAgo(report.occurred_at)}
         </small>
       </div>
       <h4>{report.title}</h4>

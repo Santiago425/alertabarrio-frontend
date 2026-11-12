@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Circle } from "react-leaflet";
+import HoodOptions from "../components/HoodOptions";
 import { api } from "../api/client";
 import AssistantChat from "../components/Assistant";
 import BaseMap from "../components/BaseMap";
@@ -119,11 +120,7 @@ export default function VigiaPage() {
         actions={
           <>
             <select value={hood} onChange={(e) => setHood(Number(e.target.value))}>
-              {neighborhoods.data?.map((n) => (
-                <option key={n.id} value={n.id}>
-                  {n.name}
-                </option>
-              ))}
+<HoodOptions hoods={neighborhoods.data} />
             </select>
             <button className="btn small ghost" onClick={() => setRefresh((x) => x + 1)}>
               Regenerar

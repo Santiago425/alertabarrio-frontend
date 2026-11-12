@@ -6,6 +6,7 @@ export interface Neighborhood {
   id: number;
   name: string;
   city: string;
+  comuna?: number | null;
   latitude: number;
   longitude: number;
 }
@@ -46,6 +47,7 @@ export interface Report {
   created_at: string;
   status: ReportStatus;
   priority_score: number;
+  address?: string | null;
   neighborhood: Neighborhood;
   incident_type: IncidentType;
   reporter_name: string;
