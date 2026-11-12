@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice"><defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05070d"/><stop offset=".55" stop-color="#0b1424"/><stop offset="1" stop-color="#14254a"/></linearGradient>
+<radialGradient id="glow" cx=".5" cy="1" r=".6"><stop offset="0" stop-color="#3b82f6" stop-opacity=".45"/><stop offset="1" stop-color="#3b82f6" stop-opacity="0"/></radialGradient>
+<radialGradient id="moon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#e0ecff"/><stop offset=".6" stop-color="#bfd4ff" stop-opacity=".9"/><stop offset="1" stop-color="#bfd4ff" stop-opacity="0"/></radialGradient>
+<linearGradient id="mt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16233d"/><stop offset="1" stop-color="#0b1220"/></linearGradient>
+<linearGradient id="mt2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f192d"/><stop offset="1" stop-color="#080d18"/></linearGradient>
+</defs><path d="M0 640 C 220 600 380 560 560 470 C 700 400 800 330 900 300 C 940 290 980 292 1010 300 C 1110 330 1220 400 1360 470 C 1520 550 1720 590 1920 610 L1920 1080 L0 1080Z" fill="url(#mt)"/><path d="M930 296 C 960 250 1010 230 1000 190 C 990 160 1040 140 1060 110" fill="none" stroke="#9fb6dd" stroke-opacity=".12" stroke-width="26" stroke-linecap="round"/></svg>
