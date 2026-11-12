@@ -39,22 +39,25 @@ function AuthLayout({ children }: { children: ReactNode }) {
       <aside className="auth-show">
         <Stripe className="show-stripe" />
         <SunEmblem size={300} tone="light" className="show-sun" />
-        <Carousel photos={COVER_PHOTOS} className="show-photos" />
-        <div className="show-copy">
-          <h2>Tu barrio, más seguro entre todos.</h2>
-          <p>AlertaBarrio conecta a los vecinos de {CITY_NAME} para avisar y prevenir incidentes.</p>
+        <div className="show-inner">
+          <Carousel photos={COVER_PHOTOS} className="show-photos" />
+          <div className="show-copy">
+            <span className="show-eyebrow"><Icon name="shield" size={14} /> Hecho en {CITY_NAME}, para {CITY_NAME}</span>
+            <h2>Tu barrio, más seguro entre todos.</h2>
+            <p>AlertaBarrio conecta a los vecinos de {CITY_NAME} para avisar y prevenir incidentes.</p>
+          </div>
+          <ul className="features">
+            {FEATURES.map((f) => (
+              <li key={f.title}>
+                <span className="f-icon"><Icon name={f.icon} size={18} /></span>
+                <div>
+                  <b>{f.title}</b>
+                  <small>{f.text}</small>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul className="features">
-          {FEATURES.map((f) => (
-            <li key={f.title}>
-              <span className="f-icon"><Icon name={f.icon} size={18} /></span>
-              <div>
-                <b>{f.title}</b>
-                <small>{f.text}</small>
-              </div>
-            </li>
-          ))}
-        </ul>
       </aside>
     </div>
   );
