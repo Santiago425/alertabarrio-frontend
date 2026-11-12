@@ -123,7 +123,7 @@ function Shell() {
             <p className="side-title">Mis barrios</p>
             {subs.data.slice(0, 5).map((s, i) => (
               <Link key={s.neighborhood.id} to="/alertas" className="side-hood">
-                <i style={{ background: ["#f3ecd9", "#e2c26f", "#e8916d", "#8fc9a8", "#d9c58f"][i % 5] }} />
+                <i style={{ background: ["#e5e7eb", "#dbeafe", "#bfdbfe", "#e0f2fe", "#cbd5e1"][i % 5] }} />
                 {s.neighborhood.name}
               </Link>
             ))}

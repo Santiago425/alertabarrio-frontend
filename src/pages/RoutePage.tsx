@@ -121,9 +121,9 @@ export default function RoutePage() {
           return <Polyline key={i} positions={[[a.latitude, a.longitude], [b.latitude, b.longitude]]} pathOptions={{ color: "#94a3b8", weight: 2, dashArray: "4 6" }} />;
         })}
         {route && (
-          <Polyline positions={route.shortest_path.map((n) => [n.latitude, n.longitude])} pathOptions={{ color: "#64748b", weight: 6, opacity: 0.6 }} />
+          <Polyline positions={route.shortest_path.map((n) => [n.latitude, n.longitude])} pathOptions={{ color: "#94a3b8", weight: 6, opacity: 0.6 }} />
         )}
-        {route && <Polyline positions={route.safe_path.map((n) => [n.latitude, n.longitude])} pathOptions={{ color: "#16a34a", weight: 5 }} />}
+        {route && <Polyline positions={route.safe_path.map((n) => [n.latitude, n.longitude])} pathOptions={{ color: "#10b981", weight: 5 }} />}
         {neighborhoods.data?.map((n) => {
           const s = severity.get(n.id) ?? 0;
           return (
