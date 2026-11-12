@@ -138,13 +138,13 @@ export function Login() {
     await enter(email, password, kind);
   };
 
-  const enter = async (mail: string, pass: string, as: "user" | "admin") => {
+  const enter = async (mail: string, pass: string, as: "user" | "admin", home = false) => {
     setBusy(true);
     setError(null);
     try {
       const resp = await api.login(mail, pass, as, needsOtp ? otp : undefined);
       signIn(resp);
-      navigate(resp.user.role === "citizen" ? "/" : "/moderacion");
+      navigate(home || resp.user.role === "citizen" ? "/" : "/moderacion");
     } catch (err) {
       if (err instanceof ApiError && err.twoFactorRequired && !needsOtp) {
         setNeedsOtp(true);
@@ -257,7 +257,7 @@ export function Login() {
               setKind("admin");
               setEmail(PROFESOR_EMAIL);
               setPassword(PROFESOR_PASSWORD);
-              void enter(PROFESOR_EMAIL, PROFESOR_PASSWORD, "admin");
+              void enter(PROFESOR_EMAIL, PROFESOR_PASSWORD, "admin", true);
             }}
           >
             Entrar como profesor
