@@ -1075,3 +1075,23 @@ input:focus, select:focus, textarea:focus,
 .features .f-icon { background: rgba(255, 255, 255, 0.08); color: #93c5fd; border: 1px solid rgba(255, 255, 255, 0.1); }
 .seg-icon { background: var(--primary); box-shadow: 0 6px 16px -6px rgba(37, 99, 235, 0.6); }
 .fab { background: var(--grad-blue) !important; box-shadow: 0 12px 28px -12px rgba(37, 99, 235, 0.8) !important; }
+
+/* ============================================================ fondo: Pasto de noche */
+.auth {
+  background:
+    linear-gradient(180deg, rgba(5, 7, 13, 0.15), rgba(5, 7, 13, 0.05) 60%, rgba(5, 7, 13, 0.25)),
+    url("/photos/night.svg") center bottom / cover no-repeat fixed,
+    #05070d !important;
+}
+.auth-form {
+  background: rgba(255, 255, 255, 0.94) !important;
+  margin: 16px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
+}
+.auth-show {
+  background: linear-gradient(180deg, rgba(5, 7, 13, 0.55), rgba(5, 7, 13, 0.25) 70%, rgba(5, 7, 13, 0)) !important;
+  box-shadow: none !important; border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+}
+.features li { background: rgba(11, 13, 18, 0.55) !important; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+@media (max-width: 960px) { .auth-form { margin: 0; border-radius: 0; } }
