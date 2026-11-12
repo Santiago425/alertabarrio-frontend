@@ -1,0 +1,9 @@
+/* Buscador de direcciones (archivo aparte para no chocar con styles.css) */
+.address-search { display: grid; gap: 6px; position: relative; }
+.address-search .row { align-items: stretch; }
+.address-search input { flex: 1; min-width: 0; }
+.address-results { list-style: none; margin: 0; padding: 4px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); max-height: 220px; overflow: auto; }
+.address-results button { width: 100%; text-align: left; border: 0; background: none; font: inherit; color: inherit; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.address-results button:hover { background: var(--surface-2); }
+.address-picked { font-size: 0.85rem; }
+.hood-add { width: 100%; margin-top: 12px; }

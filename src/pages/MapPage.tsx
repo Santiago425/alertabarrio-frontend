@@ -4,6 +4,7 @@ import { Circle, Marker, Popup } from "react-leaflet";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import type { Heatmap, Report } from "../api/types";
+import AddressSearch from "../components/AddressSearch";
 import BaseMap, { FlyTo } from "../components/BaseMap";
 import Icon from "../components/Icon";
 import { ErrorBox, StatusBadge } from "../components/ui";
@@ -45,6 +46,7 @@ export default function MapPage() {
   const [selected, setSelected] = useState<number | null>(null);
   const [target, setTarget] = useState<[number, number, number] | null>(null);
   const [me, setMe] = useState<[number, number] | null>(null);
+  const [place, setPlace] = useState<{ label: string; pos: [number, number] } | null>(null);
   const [locError, setLocError] = useState<string | null>(null);
   const markers = useRef<Record<number, L.Marker | null>>({});
 
@@ -111,6 +113,14 @@ export default function MapPage() {
     <div className="mapx">
       <ErrorBox message={reports.error} />
 
+      <AddressSearch
+        placeholder="Ir a una dirección o lugar de Pasto: Carrera 27 # 15-40, Parque Infantil…"
+        onPick={(r) => {
+          setPlace({ label: r.label, pos: [r.latitude, r.longitude] });
+          setTarget([r.latitude, r.longitude, 17]);
+        }}
+      />
+
       <div className="mapx-filters">
         <div className="segmented">
           {RANGES.map((r) => (
@@ -146,6 +156,14 @@ export default function MapPage() {
                   pathOptions={{ stroke: false, fillColor: c.intensity > 0.6 ? "#dc2626" : c.intensity > 0.3 ? "#f97316" : "#facc15", fillOpacity: 0.05 + c.intensity * 0.3 }}
                 />
               ))}
+            {place && (
+              <Marker
+                position={place.pos}
+                icon={L.divIcon({ className: "", iconSize: [22, 22], html: '<span class="pin selected" style="--c:#2563eb;width:22px;height:22px"></span>' })}
+              >
+                <Popup>{place.label}</Popup>
+              </Marker>
+            )}
             {me && (
               <Marker position={me} icon={L.divIcon({ className: "", iconSize: [18, 18], html: '<span class="me-dot"></span>' })}>
                 <Popup>Estás aquí</Popup>

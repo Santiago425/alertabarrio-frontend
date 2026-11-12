@@ -4,10 +4,13 @@ import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import type { ReportCreated } from "../api/types";
 import { ShieldArt } from "../components/Art";
+import AddressSearch from "../components/AddressSearch";
 import BaseMap, { FlyTo } from "../components/BaseMap";
+import HoodOptions from "../components/HoodOptions";
 import Icon from "../components/Icon";
 import { Card, ErrorBox, TypeBadge } from "../components/ui";
 import { pct } from "../lib/format";
+import { addressAt, matchBarrio, type AddressResult } from "../lib/address";
 import { currentPosition } from "../lib/geo";
 import { useAsync } from "../lib/useAsync";
 
@@ -22,6 +25,7 @@ export default function NewReport() {
   const types = useAsync(() => api.incidentTypes(), []);
   const [form, setForm] = useState({ title: "", description: "", incident_type_id: "", neighborhood_id: "", photo_url: "" });
   const [point, setPoint] = useState<[number, number] | null>(null);
+  const [address, setAddress] = useState("");
   const [target, setTarget] = useState<[number, number, number] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -40,14 +44,25 @@ export default function NewReport() {
   };
 
   // marcar un punto en el mapa elige solo el barrio al que pertenece
-  const placeAt = async (lat: number, lng: number) => {
+  // (primero el barrio que dice OpenStreetMap; si no lo sabe, el mas cercano segun el backend)
+  const placeAt = async (lat: number, lng: number, found?: AddressResult | null) => {
     setPoint([lat, lng]);
+    const place = found === undefined ? await addressAt(lat, lng) : found;
+    if (found === undefined) setAddress(place?.label ?? "");
+    const osm = matchBarrio(place?.barrio, neighborhoods.data);
+    if (osm) return setForm((f) => ({ ...f, neighborhood_id: String(osm.id) }));
     try {
       const n = await api.nearestNeighborhood(lat, lng);
       setForm((f) => ({ ...f, neighborhood_id: String(n.id) }));
     } catch {
       /* si falla, el vecino elige el barrio a mano */
     }
+  };
+
+  const goToAddress = (r: AddressResult) => {
+    setAddress(r.label);
+    setTarget([r.latitude, r.longitude, 17]);
+    placeAt(r.latitude, r.longitude, r);
   };
 
   const useMyLocation = async () => {
@@ -70,6 +85,7 @@ export default function NewReport() {
         neighborhood_id: Number(form.neighborhood_id),
         latitude: point[0],
         longitude: point[1],
+        address: address.trim() || null,
         photo_url: form.photo_url || null,
       });
       setResult(res);
@@ -111,7 +127,7 @@ export default function NewReport() {
           </ol>
         </Card>
         <div className="row gap-s">
-          <button className="btn" onClick={() => { setResult(null); setForm({ title: "", description: "", incident_type_id: "", neighborhood_id: "", photo_url: "" }); setPoint(null); }}>
+          <button className="btn" onClick={() => { setResult(null); setForm({ title: "", description: "", incident_type_id: "", neighborhood_id: "", photo_url: "" }); setPoint(null); setAddress(""); }}>
             Hacer otro reporte
           </button>
           <Link className="btn ghost" to="/mis-reportes">Ver mis reportes</Link>
@@ -146,12 +162,12 @@ export default function NewReport() {
           Barrio <small className="muted">(sale solo del punto en el mapa)</small>
           <select value={form.neighborhood_id} onChange={set("neighborhood_id")} required>
             <option value="">— Elegir —</option>
-            {neighborhoods.data?.map((n) => (
-              <option key={n.id} value={n.id}>
-                {n.name}
-              </option>
-            ))}
+            <HoodOptions hoods={neighborhoods.data} />
           </select>
+        </label>
+        <label>
+          Dirección <small className="muted">(opcional, sale del mapa o la escribes)</small>
+          <input value={address} onChange={(e) => setAddress(e.target.value)} maxLength={200} placeholder="Ej: Calle 18 # 25-30, frente a la panadería" />
         </label>
         <label>
           Foto (URL, opcional)
@@ -163,8 +179,9 @@ export default function NewReport() {
         </button>
       </form>
       <div className="stack-s">
+        <AddressSearch onPick={goToAddress} />
         <div className="row space">
-          <p className="muted">Toca el mapa donde ocurrió.</p>
+          <p className="muted">O toca el mapa donde ocurrió.</p>
           <button type="button" className="btn small ghost" onClick={useMyLocation}>
             <Icon name="pin" size={14} /> Usar mi ubicación
           </button>
