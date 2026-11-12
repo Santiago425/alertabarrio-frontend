@@ -8,7 +8,7 @@ import Icon, { type IconName } from "./components/Icon";
 import { PhotoCredits } from "./components/Photos";
 import Logo from "./components/Logo";
 import { Stripe, SunEmblem } from "./components/Decor";
-import { ASSISTANT_NAME, CITY_NAME, CITY_REGION } from "./config";
+import { ASSISTANT_NAME, CITY_NAME, CITY_REGION, PROFESOR_EMAIL } from "./config";
 import { useAiOnline } from "./lib/useAiOnline";
 import { useAsync } from "./lib/useAsync";
 import Alerts from "./pages/Alerts";
@@ -75,7 +75,9 @@ export default function App() {
       </Routes>
     );
   }
-  if (isAuth) return <Navigate to={isModerator ? "/moderacion" : "/"} replace />;
+  // La cuenta del profesor entra al Panel aunque sea administrador.
+  const isProfe = user.email?.toLowerCase() === PROFESOR_EMAIL.toLowerCase();
+  if (isAuth) return <Navigate to={isModerator && !isProfe ? "/moderacion" : "/"} replace />;
   return <Shell />;
 }
 
