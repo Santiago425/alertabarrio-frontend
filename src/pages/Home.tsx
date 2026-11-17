@@ -8,6 +8,7 @@ import { Carousel, CITY_PHOTOS, SECURITY_PHOTOS } from "../components/Photos";
 import { SunEmblem } from "../components/Decor";
 import BaseMap from "../components/BaseMap";
 import Icon, { type IconName } from "../components/Icon";
+import Pasto3D from "../components/Pasto3D";
 import { DAYS, greeting, longDate, timeAgo } from "../lib/format";
 import { ASSISTANT_NAME, CITY_NAME } from "../config";
 import { useAiOnline } from "../lib/useAiOnline";
@@ -85,6 +86,17 @@ export default function Home() {
       </div>
 
       <Seguridad />
+
+      <section className="panel pasto3d-panel">
+        <div className="panel-head">
+          <h3>
+            <Icon name="map" size={16} /> {CITY_NAME} en 3D
+          </h3>
+          <span className="tag">{feed.data ? `${Math.min(30, feed.data.length)} alertas` : "Cargando…"}</span>
+        </div>
+        <Pasto3D reports={feed.data ?? undefined} />
+        <p className="pasto3d-hint">Arrastra para girar · Toca el terreno para lanzar una onda de aviso · Pasa por un faro para ver la alerta</p>
+      </section>
 
       <section>
         <div className="panel-head">
