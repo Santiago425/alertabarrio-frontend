@@ -1120,3 +1120,45 @@ body { background: #05070d !important; }
 .content > section > h2, .content > section > h3 { color: #fff; }
 .content > .page-head .muted, .content > p.muted { color: rgba(255, 255, 255, 0.7); }
 .header .icon-btn, .header .icon-btn svg, .header .menu-btn svg { color: #fff !important; }
+
+/* ============================================================ intro de entrada y Pasto en 3D */
+.intro {
+  position: fixed; inset: 0; z-index: 9999; display: grid; place-content: center; justify-items: center; gap: 10px;
+  background: radial-gradient(700px 420px at 50% 45%, rgba(37, 99, 235, 0.22), transparent 70%), #05070d;
+  color: #fff; transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.intro.leaving { opacity: 0; transform: scale(1.04); pointer-events: none; }
+.intro-stage { position: relative; width: 190px; height: 190px; display: grid; place-items: center; }
+.intro-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+.intro-track { fill: none; stroke: rgba(255, 255, 255, 0.08); stroke-width: 2; }
+.intro-bar { fill: none; stroke: #60a5fa; stroke-width: 2.5; stroke-linecap: round; }
+.intro-logo {
+  position: relative; transform: scale(calc(0.55 + var(--p, 0) * 0.45)) rotate(calc((1 - var(--p, 0)) * -40deg));
+  filter: drop-shadow(0 10px 30px rgba(37, 99, 235, 0.55));
+}
+.intro-wave { position: absolute; width: 80px; height: 80px; border-radius: 50%; border: 1.5px solid rgba(96, 165, 250, 0.6); animation: introWave 2.4s ease-out infinite; }
+.intro-wave.w2 { animation-delay: 0.8s; }
+.intro-wave.w3 { animation-delay: 1.6s; }
+@keyframes introWave { from { transform: scale(0.8); opacity: 0.9; } to { transform: scale(2.3); opacity: 0; } }
+.intro-brand { font-family: "Space Grotesk", "Inter", sans-serif; font-size: 1.7rem; letter-spacing: -0.02em; margin-top: 8px; }
+.intro-brand span { display: inline-block; animation: introLetter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes introLetter { from { opacity: 0; transform: translateY(14px) rotateX(70deg); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+.intro-city { color: rgba(255, 255, 255, 0.55); letter-spacing: 0.24em; text-transform: uppercase; font-size: 0.72rem; }
+.intro-count { position: fixed; left: 28px; bottom: 24px; font: 600 0.85rem/1 ui-monospace, "SFMono-Regular", Menlo, monospace; color: rgba(255, 255, 255, 0.6); letter-spacing: 0.1em; }
+.intro-skip {
+  position: fixed; right: 24px; bottom: 18px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px; padding: 8px 16px; font: 500 0.82rem Inter, system-ui, sans-serif; cursor: pointer;
+}
+.intro-skip:hover { background: rgba(255, 255, 255, 0.16); }
+
+.panel.pasto3d-panel {
+  background: radial-gradient(900px 320px at 50% 0%, rgba(37, 99, 235, 0.25), transparent 70%), linear-gradient(180deg, #0b1020 0%, #05070d 100%) !important;
+  color: #fff; border-color: rgba(255, 255, 255, 0.1); overflow: hidden;
+}
+.pasto3d-panel .panel-head h3 { color: #fff; display: flex; align-items: center; gap: 8px; }
+.pasto3d-panel .tag { background: rgba(255, 255, 255, 0.1); color: #e2e8f0; }
+.pasto3d { display: block; width: 100%; height: 360px; cursor: grab; touch-action: pan-y; user-select: none; }
+.pasto3d:active { cursor: grabbing; }
+.pasto3d-hint { margin: 8px 0 0; text-align: center; font-size: 0.78rem; color: rgba(226, 232, 240, 0.6); }
+@media (max-width: 640px) { .pasto3d { height: 270px; } .pasto3d-hint { font-size: 0.72rem; } }
+@media (prefers-reduced-motion: reduce) { .intro-wave, .intro-brand span { animation: none; } }
