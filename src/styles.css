@@ -1509,3 +1509,8 @@ input:focus, select:focus, textarea:focus, .field input:focus, .field select:foc
 .heat-legend i { display: inline-block; width: 90px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #fb923c, #f43f5e, #dc2626, #7f1d1d); }
 .heat-hot { margin: 10px 0 0; font-size: 0.9rem; }
 .heat-hot b { color: #be123c; }
+
+/* Exportar reporte filtrado */
+.stats-export { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px dashed #fecdd3; }
+.stats-export .small-text { font-size: 0.85rem; }
+.stats-export b { color: #9f1239; }
