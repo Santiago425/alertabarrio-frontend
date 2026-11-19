@@ -4,7 +4,14 @@ import type { StatusEntry } from "../api/types";
 import Icon from "../components/Icon";
 import ReportCard from "../components/ReportCard";
 import { Card, ErrorBox, HeapTree, Loading, StackView } from "../components/ui";
-import { STATUS_LABEL } from "../lib/format";
+import { STATUS_LABEL, timeAgo } from "../lib/format";
+
+const URGENCY = [
+  { key: "alta", label: "Alta", hint: "80 pts o más", min: 80 },
+  { key: "media", label: "Media", hint: "55 a 79 pts", min: 55 },
+  { key: "baja", label: "Baja", hint: "menos de 55 pts", min: -Infinity },
+];
+const urgencyOf = (score: number) => URGENCY.find((u) => score >= u.min)!;
 import { useAsync } from "../lib/useAsync";
 
 export default function Moderation() {
@@ -34,7 +41,7 @@ export default function Moderation() {
   const takeNext = () =>
     run(async () => {
       const r = await api.takeNext();
-      return `Pop del heap → #${r.id} "${r.title}" (prioridad ${r.priority_score}) pasó a revisión.`;
+      return `Abriste el reporte más urgente: #${r.id} "${r.title}" (puntaje ${Math.round(r.priority_score)}). Ahora está abajo, en "En revisión".`;
     });
   const publish = (id: number) =>
     run(async () => {
@@ -55,7 +62,7 @@ export default function Moderation() {
     run(async () => {
       const r = await api.undo(id);
       setLastStack({ id, stack: r.stack });
-      return `Deshacer (pop de la pila) #${id}: se quitó "${STATUS_LABEL[r.undone_status]}", ahora está "${STATUS_LABEL[r.current_status]}".`;
+      return `Se deshizo el último cambio del reporte #${id}: estaba "${STATUS_LABEL[r.undone_status]}" y volvió a "${STATUS_LABEL[r.current_status]}".`;
     });
 
   return (
@@ -95,43 +102,98 @@ export default function Moderation() {
       {msg && <div className="alert-ok">{msg}</div>}
       <ErrorBox message={error} />
 
-      <div className="two-col">
-        <Card
-          title={<>Pendientes por revisar ({queue.data?.size ?? 0})</>}
-          actions={
-            <button className="btn" onClick={takeNext} disabled={!queue.data?.size}>
-              Tomar el siguiente más grave
-            </button>
-          }
-        >
-          {queue.loading && <Loading />}
-          {queue.data && <HeapTree heap={queue.data.heap_array} />}
-          <p className="muted">Orden en que van a salir:</p>
-          <ol className="queue-list">
-            {queue.data?.reports.map((r) => (
-              <li key={r.id}>
-                <span className="dot" style={{ background: r.incident_type.color }} />
-                <b>{r.priority_score}</b> · #{r.id} {r.title} <small className="muted">({r.neighborhood.name})</small>
-                <span className="row gap-s right">
+      <Card
+        title={<>Pendientes por revisar ({queue.data?.size ?? 0})</>}
+        actions={
+          <button className="btn" onClick={takeNext} disabled={!queue.data?.size}>
+            Abrir el más urgente
+          </button>
+        }
+      >
+        <div className="urg-help">
+          <p>
+            Cada reporte nuevo espera aquí hasta que lo revises. Están <b>ordenados del más urgente al menos urgente</b>, así atiendes primero lo
+            más peligroso. El botón <b>Abrir el más urgente</b> pasa el primero de la lista a "En revisión".
+          </p>
+          <div className="urg-legend">
+            {URGENCY.map((u) => (
+              <span key={u.key} className={`urg-chip ${u.key}`}>
+                <i /> {u.label}: {u.hint}
+              </span>
+            ))}
+          </div>
+          <p className="muted small-text">
+            El puntaje sale de: gravedad del tipo de incidente (1 a 5) × 20 + qué tan peligrosa es la zona a esa hora según la IA (hasta 20) + 5
+            si trae foto. Máximo cerca de 125.
+          </p>
+        </div>
+
+        {queue.loading && <Loading />}
+        {queue.data?.size === 0 && <p className="muted">No hay reportes pendientes. ¡Todo al día!</p>}
+        <ol className="pend-list">
+          {queue.data?.reports.map((r, i) => {
+            const u = urgencyOf(r.priority_score);
+            return (
+              <li key={r.id} className={`pend-card ${u.key}`}>
+                <div className="pend-rank" title="Turno de atención">
+                  <small>Turno</small>
+                  <b>{i + 1}</b>
+                </div>
+                <div className="pend-body">
+                  <div className="pend-top">
+                    <span className="pend-type" style={{ color: r.incident_type.color, background: `${r.incident_type.color}18` }}>
+                      <span className="dot" style={{ background: r.incident_type.color }} />
+                      {r.incident_type.name}
+                    </span>
+                    <span className={`urg-chip ${u.key}`}>
+                      <i /> Urgencia {u.label.toLowerCase()}
+                    </span>
+                  </div>
+                  <h4 className="pend-title">{r.title}</h4>
+                  <p className="pend-meta">
+                    <Icon name="pin" size={13} /> {r.neighborhood.name} · <Icon name="clock" size={13} /> llegó {timeAgo(r.created_at)}
+                    {r.photos?.length ? " · con foto" : ""} · #{r.id}
+                  </p>
+                  <div className="urg-bar" title={`Puntaje ${Math.round(r.priority_score)} de 125`}>
+                    <span style={{ width: `${Math.min(100, (r.priority_score / 125) * 100)}%` }} />
+                    <em>{Math.round(r.priority_score)} pts</em>
+                  </div>
+                </div>
+                <div className="pend-actions">
                   <button className="btn small" onClick={() => publish(r.id)}>Publicar</button>
                   <button className="btn small ghost" onClick={() => reject(r.id)}>Rechazar</button>
-                </span>
+                </div>
               </li>
-            ))}
-          </ol>
-        </Card>
+            );
+          })}
+        </ol>
 
-        <Card title={<>Último cambio (para deshacer)</>}>
+        {queue.data && queue.data.size > 0 && (
+          <details className="inner-how">
+            <summary>Ver el orden de atención como árbol</summary>
+            <p className="muted">
+              Así guarda el sistema los pendientes por dentro: cada círculo es un reporte con su puntaje, y <b>el más urgente siempre queda
+              arriba</b>. Cuando sale uno, el siguiente más urgente sube solo. Por eso encontrar el más grave es instantáneo, aunque haya miles.
+            </p>
+            <HeapTree heap={queue.data.heap_array} />
+          </details>
+        )}
+      </Card>
+
+        <Card title={<>Deshacer</>}>
+          <p className="muted">
+            Si te equivocas al publicar, rechazar o retirar, usa <b>↶ Deshacer</b> en el reporte: vuelve al estado anterior. Aquí verás
+            cómo quedó su historial.
+          </p>
           {lastStack ? (
             <>
               <p className="muted">Reporte #{lastStack.id}</p>
               <StackView entries={lastStack.stack} />
             </>
           ) : (
-            <p className="muted">Sin acciones deshechas.</p>
+            <p className="muted">Todavía no has deshecho nada.</p>
           )}
         </Card>
-      </div>
 
       <h3>En revisión</h3>
       {review.data?.length === 0 && <p className="muted">Nada en revisión.</p>}

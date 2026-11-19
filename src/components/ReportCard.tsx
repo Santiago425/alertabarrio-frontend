@@ -75,7 +75,7 @@ export default function ReportCard({ report, onChanged, actions }: Props) {
             </button>
           )}
           <button className="btn small ghost" onClick={toggleHistory}>
-            {history ? "Ocultar historial" : "Historial (pila)"}
+            {history ? "Ocultar historial" : "Historial"}
           </button>
           {actions}
         </div>

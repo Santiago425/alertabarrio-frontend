@@ -41,7 +41,7 @@ export function DSTag({ children }: { children: ReactNode }) {
   return <span className="ds-tag">{children}</span>;
 }
 
-/** Dibuja la PILA de estados: el tope arriba. */
+/** Historial de estados del reporte: el más reciente arriba (internamente es una pila). */
 export function StackView({ entries }: { entries: StatusEntry[] }) {
   if (!entries.length) return <p className="muted">Sin historial</p>;
   return (
@@ -49,7 +49,7 @@ export function StackView({ entries }: { entries: StatusEntry[] }) {
       {entries.map((e, i) => (
         <div key={e.id} className={`stack-item ${i === 0 ? "top" : ""}`}>
           <span>
-            {i === 0 && <b className="top-label">TOPE → </b>}
+            {i === 0 && <b className="top-label">Actual: </b>}
             {STATUS_LABEL[e.new_status]}
           </span>
           <small className="muted">
@@ -58,7 +58,6 @@ export function StackView({ entries }: { entries: StatusEntry[] }) {
           </small>
         </div>
       ))}
-      <div className="stack-base">base</div>
     </div>
   );
 }
@@ -76,7 +75,7 @@ export function HeapTree({ heap }: { heap: { priority: number; id: number }[] })
       {levels.map((nodes, l) => (
         <div className="heap-level" key={l}>
           {nodes.map((n) => (
-            <div className="heap-node" key={n.id} title={`posición ${n.index} del arreglo`}>
+            <div className={`heap-node ${n.priority >= 80 ? "alta" : n.priority >= 55 ? "media" : "baja"}`} key={n.id} title={`Reporte #${n.id}, puntaje ${n.priority}`}>
               <b>{n.priority}</b>
               <small>#{n.id}</small>
             </div>
@@ -84,7 +83,7 @@ export function HeapTree({ heap }: { heap: { priority: number; id: number }[] })
         </div>
       ))}
       <div className="heap-array">
-        arreglo: [{heap.map((h) => h.priority).join(", ")}]
+        en memoria: [{heap.map((h) => h.priority).join(", ")}]
       </div>
     </div>
   );
