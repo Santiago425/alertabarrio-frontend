@@ -3,58 +3,126 @@ import type { ReportStatus } from "../api/types";
 import { Card, HeapTree } from "../components/ui";
 import { STATUS_LABEL } from "../lib/format";
 import { useState } from "react";
-import Icon from "../components/Icon";
+import Icon, { type IconName } from "../components/Icon";
 import { ASSISTANT_NAME } from "../config";
 import { useAsync } from "../lib/useAsync";
 
-const GUIDE: { title: string; use: string; how: string; file: string }[] = [
+type Doc = { title: string; icon: IconName; use: string; how: string; ds: string; cost: string };
+
+const MODULES: { title: string; who: string; docs: Doc[] }[] = [
   {
-    title: "Reportar hablando",
-    use: `El vecino le cuenta a ${ASSISTANT_NAME} qué pasó, por voz o texto.`,
-    how: "El navegador pasa la voz a texto, el componente de IA (Gemini) saca el tipo de incidente, título y descripción, y el backend busca el barrio más cercano a la ubicación del celular (distancia haversine).",
-    file: "backend: routers/ai.py · services/geo.py — IA: providers/interpret.py",
+    title: "Para el vecino",
+    who: "Lo que usa cualquier usuario",
+    docs: [
+      {
+        title: "Reportar hablando",
+        icon: "mic",
+        use: `El vecino le cuenta a ${ASSISTANT_NAME} qué pasó, por voz o texto, y el reporte se arma solo.`,
+        how: "El navegador pasa la voz a texto, la IA (Gemini) saca el tipo, título y descripción, y el backend ubica el barrio más cercano al GPS (distancia haversine).",
+        ds: "IA + haversine",
+        cost: "O(n) barrios",
+      },
+      {
+        title: "Alertas por barrio",
+        icon: "alert",
+        use: "Cada barrio tiene su lista de alertas activas, de la más nueva a la más vieja.",
+        how: "Tabla hash barrio → lista enlazada. Encontrar el barrio y agregar al inicio de la lista es inmediato.",
+        ds: "HashTable + LinkedList",
+        cost: "O(1)",
+      },
+      {
+        title: "Notificaciones",
+        icon: "bell",
+        use: "Cuando se publica una alerta, se avisa a los vecinos suscritos al barrio en orden de llegada.",
+        how: "Cola FIFO sobre un buffer circular: se encola al final y se despacha desde el frente.",
+        ds: "Queue (FIFO)",
+        cost: "O(1)",
+      },
+      {
+        title: "Ruta segura",
+        icon: "route",
+        use: `"Necesito ir al centro": ${ASSISTANT_NAME} entiende el destino y sale desde tu ubicación evitando barrios con alertas.`,
+        how: "Grafo de barrios: Dijkstra con castigo por alertas activas (segura), Dijkstra normal (más corta) y BFS (menos barrios).",
+        ds: "Graph · Dijkstra · BFS",
+        cost: "O((V + E) log V)",
+      },
+      {
+        title: "Mis rutas",
+        icon: "clock",
+        use: "Cada ruta que consultas se guarda (ej. de la U a tu casa) para abrirla otra vez con un clic y ponerle nombre.",
+        how: "Tabla saved_routes por usuario: si la ruta ya existe solo sube su contador de usos.",
+        ds: "Tabla saved_routes",
+        cost: "O(1) por consulta",
+      },
+    ],
   },
   {
-    title: "Moderación por prioridad",
-    use: "Los reportes más graves se revisan primero.",
-    how: "Cola de prioridad con un max-heap: cada reporte entra con una prioridad (gravedad + riesgo de la IA + foto) y pop() siempre saca el más urgente en O(log n).",
-    file: "backend: structures/priority_queue.py",
+    title: "Para el administrador",
+    who: "Solo lo ve quien entra como administrador",
+    docs: [
+      {
+        title: "Moderación por prioridad",
+        icon: "shield",
+        use: "Todo reporte queda pendiente hasta que el admin lo publica o lo rechaza; los más graves se revisan primero.",
+        how: "Max-heap: cada reporte entra con su prioridad (gravedad + riesgo de la IA + foto) y pop() siempre saca el más urgente.",
+        ds: "PriorityQueue (max-heap)",
+        cost: "O(log n)",
+      },
+      {
+        title: "Historial y deshacer",
+        icon: "layers",
+        use: "Cada reporte guarda sus cambios de estado y el admin puede deshacer el último (publicar, rechazar o retirar).",
+        how: "Una pila por reporte: push al cambiar de estado y pop al deshacer.",
+        ds: "Stack (LIFO)",
+        cost: "O(1)",
+      },
+      {
+        title: "Configuración de alertas",
+        icon: "sliders",
+        use: "Crear tipos nuevos (ej. Accidente de moto), cambiarles el nombre, la gravedad, el color y cuánto duran en el mapa, sin tocar la base de datos.",
+        how: "CRUD sobre la tabla incident_types. Un tipo con reportes no se borra: se desactiva para no perder datos.",
+        ds: "Tabla incident_types",
+        cost: "O(1) por cambio",
+      },
+      {
+        title: "Vencimiento de alertas",
+        icon: "clock",
+        use: "Cada alerta dura lo que diga su tipo (un accidente 1 hora). Al vencer sale del mapa sola, pero queda guardada.",
+        how: "vence = publicada + duración del tipo. El feed solo muestra las que no han vencido; cambiar la duración aplica de una.",
+        ds: "HashTable tipo → minutos",
+        cost: "O(1) por alerta",
+      },
+    ],
   },
   {
-    title: "Notificaciones a los vecinos",
-    use: "Cuando se publica un reporte, se avisa a los suscritos del barrio en el orden en que llegaron.",
-    how: "Cola FIFO sobre un buffer circular: enqueue al final, dequeue al frente, ambas en O(1).",
-    file: "backend: structures/queue.py",
-  },
-  {
-    title: "Historial y deshacer",
-    use: "Cada reporte guarda sus cambios de estado y el moderador puede deshacer el último.",
-    how: "Una pila por reporte: push al cambiar de estado y pop al deshacer (LIFO).",
-    file: "backend: structures/stack.py",
-  },
-  {
-    title: "Alertas por barrio",
-    use: "Cada barrio tiene su lista de alertas, de la más nueva a la más vieja.",
-    how: "Tabla hash (barrio → lista enlazada). Buscar el barrio es O(1) y agregar al inicio de la lista también.",
-    file: "backend: structures/hash_table.py · structures/linked_list.py",
-  },
-  {
-    title: "Historial por fechas",
-    use: "Consultar los reportes entre dos fechas.",
-    how: "Árbol AVL ordenado por fecha: se mantiene balanceado, así la búsqueda por rango es O(log n + k).",
-    file: "backend: structures/bst.py",
-  },
-  {
-    title: "Ruta segura",
-    use: `"Necesito ir al centro": ${ASSISTANT_NAME} entiende el destino y sale desde tu ubicación.`,
-    how: "Grafo de barrios: Dijkstra con castigo por alertas activas para la ruta segura, Dijkstra normal para la más corta y BFS para la de menos barrios.",
-    file: "backend: structures/graph.py · routers/routes.py",
-  },
-  {
-    title: "Búsqueda y ranking de barrios",
-    use: "Encontrar un barrio por nombre y ver los que tienen más alertas.",
-    how: "Búsqueda binaria sobre el catálogo ordenado y quick sort para el ranking.",
-    file: "backend: structures/sorting.py",
+    title: "Datos y estadísticas",
+    who: "Todo lo guardado, también lo que ya venció",
+    docs: [
+      {
+        title: "Historial por fechas",
+        icon: "list",
+        use: "Consultar los reportes entre dos fechas.",
+        how: "Árbol AVL ordenado por fecha: se mantiene balanceado, así la búsqueda por rango es rápida.",
+        ds: "AVL (BST balanceado)",
+        cost: "O(log n + k)",
+      },
+      {
+        title: "Estadísticas",
+        icon: "chart",
+        use: "Cuántos incidentes hubo por mes, barrio, comuna, hora y día. Ej: cuántos accidentes hubo en el Centro cada mes.",
+        how: "Se cuentan todos los reportes aprobados (también los vencidos) con conteos por clave.",
+        ds: "Conteo con tablas hash",
+        cost: "O(n)",
+      },
+      {
+        title: "Búsqueda y ranking de barrios",
+        icon: "map",
+        use: "Encontrar un barrio por nombre y ver los que tienen más alertas activas.",
+        how: "Búsqueda binaria sobre el catálogo ordenado con merge sort, y quick sort para el ranking.",
+        ds: "Binary search · Quick sort",
+        cost: "O(log n) · O(n log n)",
+      },
+    ],
   },
 ];
 
@@ -87,16 +155,46 @@ export default function Docs() {
 
   return (
     <div className="stack-l">
-      <div className="docs-grid">
-        {GUIDE.map((g) => (
-          <article key={g.title} className="card doc-card">
-            <h3>{g.title}</h3>
-            <p>{g.use}</p>
-            <p className="muted">{g.how}</p>
-            <code>{g.file}</code>
-          </article>
-        ))}
-      </div>
+      <section className="card docs-hero">
+        <span className="docs-hero-icon">
+          <Icon name="book" size={24} />
+        </span>
+        <div>
+          <h2>¿Para qué sirve esta página?</h2>
+          <p>
+            Es el manual técnico de AlertaBarrio para el administrador. Explica <b>qué hace cada parte</b> de la app, <b>qué estructura de datos</b>{" "}
+            usa por dentro y <b>qué tan rápido</b> es (complejidad). Abajo puedes ver el estado
+            real de cada estructura en este momento.
+          </p>
+        </div>
+      </section>
+
+      {MODULES.map((m) => (
+        <section key={m.title} className="stack-m">
+          <header className="docs-module">
+            <h2 className="section-title">{m.title}</h2>
+            <span className="muted">{m.who}</span>
+          </header>
+          <div className="docs-grid">
+            {m.docs.map((g) => (
+              <article key={g.title} className="card doc-card">
+                <div className="doc-head">
+                  <span className="doc-icon">
+                    <Icon name={g.icon} size={18} />
+                  </span>
+                  <h3>{g.title}</h3>
+                </div>
+                <p>{g.use}</p>
+                <p className="muted">{g.how}</p>
+                <div className="doc-tags">
+                  <span className="doc-tag ds" title="Estructura de datos">{g.ds}</span>
+                  <span className="doc-tag cost" title="Complejidad">{g.cost}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ))}
 
       <div className="toolbar left">
         <button className="btn ghost" onClick={() => (live ? state.reload() : setLive(true))}>

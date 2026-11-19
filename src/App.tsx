@@ -44,7 +44,7 @@ function Private({ children, moderator = false, admin = false }: { children: Rea
   const { user, loading, isModerator } = useAuth();
   if (loading) return <p className="muted">Cargando…</p>;
   if (!user) return <Navigate to="/login" replace />;
-  if (moderator && !isModerator) return <p>Esta sección es solo para moderadores.</p>;
+  if (moderator && !isModerator) return <p>Esta sección es solo para el administrador.</p>;
   if (admin && user.role !== "admin") return <p>Esta sección es solo para el administrador.</p>;
   return <>{children}</>;
 }
@@ -99,7 +99,8 @@ function Shell() {
   const notes = useAsync(() => (user ? api.notifications() : Promise.resolve([])), [user?.id, location.pathname]);
   const subs = useAsync(() => (user ? api.mySubscriptions() : Promise.resolve([])), [user?.id]);
   const unread = notes.data?.filter((n) => !n.is_read).length ?? 0;
-  const initials = (user?.full_name ?? "").split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
+  // solo letras: "Profesor (vecino)" -> "PV"
+  const initials = (user?.full_name ?? "").replace(/[^\p{L}\s]/gu, "").split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]).join("").toUpperCase();
   const title = TITLES[location.pathname] ?? "AlertaBarrio";
 
   return (
@@ -123,7 +124,7 @@ function Shell() {
           <NavItem to="/estadisticas" icon="chart" label="Estadísticas" />
           {isModerator && <NavItem to="/moderacion" icon="shield" label="Moderación" />}
           {user?.role === "admin" && <NavItem to="/configuracion" icon="sliders" label="Configuración de alertas" />}
-          <NavItem to="/documentacion" icon="book" label="Documentación" />
+          {isModerator && <NavItem to="/documentacion" icon="book" label="Documentación" />}
         </nav>
 
         {user && !!subs.data?.length && (
@@ -182,7 +183,7 @@ function Shell() {
             <Route path="/alertas" element={<Private><Alerts /></Private>} />
             <Route path="/vigia" element={<VigiaPage />} />
             <Route path="/rutas" element={<RoutePage />} />
-            <Route path="/documentacion" element={<Docs />} />
+            <Route path="/documentacion" element={<Private moderator><Docs /></Private>} />
             <Route path="/feed" element={<Navigate to="/alertas" replace />} />
             <Route path="/reportar" element={<Navigate to="/alertas" replace />} />
             <Route path="/ia" element={<Navigate to="/vigia" replace />} />
