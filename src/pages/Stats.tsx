@@ -8,6 +8,7 @@ import { Card, ErrorBox, Loading } from "../components/ui";
 import { CITY_NAME } from "../config";
 import { DAYS } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
+import { exportExcel, exportPdf, slug } from "../lib/exportReport";
 
 /**
  * Estadisticas con TODOS los reportes guardados (tambien los que ya vencieron
@@ -56,6 +57,22 @@ export default function Stats() {
   const typeName = type ? types.data?.find((t) => String(t.id) === type)?.name : null;
   const monthLabel = month ? lastMonths().find((m) => m.value === month)?.label.toLowerCase() : null;
   const periodText = monthLabel ? `en ${monthLabel}` : `últimos ${s?.months ?? months} meses`;
+  const reportTitle = `${typeName ?? "Incidentes"} en ${zone}, ${monthLabel ?? `últimos ${months} meses`}`;
+  const [exporting, setExporting] = useState<"" | "xlsx" | "pdf">("");
+  const [exportError, setExportError] = useState<string | null>(null);
+  const doExport = async (kind: "xlsx" | "pdf") => {
+    if (!s) return;
+    setExporting(kind);
+    setExportError(null);
+    try {
+      const info = { title: reportTitle, fileName: `alertabarrio-${slug(reportTitle)}` };
+      await (kind === "xlsx" ? exportExcel(s, info) : exportPdf(s, info));
+    } catch {
+      setExportError("No se pudo generar el archivo. Intenta de nuevo.");
+    } finally {
+      setExporting("");
+    }
+  };
 
   return (
     <div className="stack-l">
@@ -100,9 +117,22 @@ export default function Stats() {
             <TypeOptions types={types.data} />
           </select>
         </label>
+        <div className="stats-export">
+          <span className="muted small-text">
+            Exportar <b>{reportTitle}</b>
+          </span>
+          <div className="row gap-s">
+            <button className="btn small" disabled={!s?.records || !!exporting} onClick={() => doExport("xlsx")}>
+              {exporting === "xlsx" ? "Generando…" : "Excel"}
+            </button>
+            <button className="btn small ghost" disabled={!s?.records || !!exporting} onClick={() => doExport("pdf")}>
+              {exporting === "pdf" ? "Generando…" : "PDF"}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <ErrorBox message={stats.error} />
+      <ErrorBox message={stats.error || exportError} />
       {stats.loading && !s && <Loading text="Calculando estadísticas…" />}
       {s && (
         <>
