@@ -17,6 +17,44 @@ export interface IncidentType {
   name: string;
   severity_level: number;
   color: string;
+  duration_minutes?: number | null; // cuanto dura la alerta en el mapa (0 = no vence)
+  is_active?: boolean;
+}
+
+export interface IncidentTypeAdmin extends IncidentType {
+  reports_total: number;
+  active_now: number;
+}
+
+export interface IncidentTypeInput {
+  name: string;
+  severity_level: number;
+  color: string;
+  duration_minutes: number;
+  is_active: boolean;
+}
+
+export interface SavedRoute {
+  id: number;
+  from_neighborhood: Neighborhood;
+  to_neighborhood: Neighborhood;
+  label: string | null;
+  times_used: number;
+  created_at: string;
+  last_used_at: string;
+}
+
+export interface ZoneStats {
+  months: number;
+  total: number;
+  active_now: number;
+  expired: number;
+  by_month: { month: string; label: string; total: number; by_type: Record<string, number> }[];
+  by_type: { id: number; code: string; name: string; color: string; count: number }[];
+  top_neighborhoods: { id: number; name: string; comuna: number | null; count: number }[];
+  by_comuna: { comuna: number; count: number }[];
+  by_hour: number[];
+  by_weekday: number[];
 }
 
 export interface User {
@@ -56,6 +94,9 @@ export interface Report {
   ai_confidence?: number | null;
   ai_zone_risk?: number | null;
   confirmations?: number | null;
+  published_at?: string | null;
+  expires_at?: string | null; // cuando sale del mapa
+  expired?: boolean; // ya vencio: sigue en el historial
 }
 
 export interface AIResult {
@@ -176,6 +217,7 @@ export interface DashboardStats {
   total_reports: number;
   by_status: Record<ReportStatus, number>;
   active_alerts: number;
+  expired_alerts?: number;
   pending_moderation: number;
   neighborhoods: number;
   users: number;

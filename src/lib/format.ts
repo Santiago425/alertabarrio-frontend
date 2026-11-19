@@ -48,3 +48,22 @@ export function greeting(date = new Date()): string {
 
 export const longDate = (date = new Date()) =>
   date.toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
+
+/** 60 -> "1 h", 90 -> "1 h 30 min", 2880 -> "2 días", 0 -> "No vence" */
+export function duration(minutes?: number | null): string {
+  if (!minutes) return "No vence";
+  if (minutes % 1440 === 0) return `${minutes / 1440} día${minutes === 1440 ? "" : "s"}`;
+  if (minutes < 60) return `${minutes} min`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m ? `${h} h ${m} min` : `${h} h`;
+}
+
+/** Cuanto le falta a una alerta para salir del mapa. */
+export function expiresIn(iso: string): string {
+  const diff = (new Date(iso).getTime() - Date.now()) / 60000;
+  if (diff <= 0) return "vencida";
+  if (diff < 60) return `vence en ${Math.ceil(diff)} min`;
+  if (diff < 1440) return `vence en ${Math.round(diff / 60)} h`;
+  return `vence en ${Math.round(diff / 1440)} días`;
+}

@@ -123,7 +123,8 @@ export default function NewReport() {
               Entró a la <b>cola de prioridad</b> de moderación con prioridad <b>{report.priority_score}</b>: está en la posición{" "}
               <b>{result.queue_position}</b> de {result.queue_size}.
             </li>
-            <li>Cuando un moderador lo publique, se notificará a los vecinos suscritos al barrio.</li>
+            <li>Por ahora está <b>pendiente</b>: solo tú y el administrador lo ven. Cuando el administrador lo apruebe, sale en el mapa y se notifica a los vecinos suscritos al barrio.</li>
+            <li>La alerta dura en el mapa lo que diga su tipo; después sale sola, pero queda guardada en el historial.</li>
           </ol>
         </Card>
         <div className="row gap-s">

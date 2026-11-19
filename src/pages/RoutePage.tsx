@@ -3,13 +3,14 @@ import { CircleMarker, Polyline, Tooltip } from "react-leaflet";
 import { useSearchParams } from "react-router-dom";
 import HoodOptions from "../components/HoodOptions";
 import { api } from "../api/client";
-import type { SafeRoute } from "../api/types";
+import type { SafeRoute, SavedRoute } from "../api/types";
+import { useAuth } from "../auth/AuthContext";
 import BaseMap from "../components/BaseMap";
 import Icon from "../components/Icon";
 import VoiceInput from "../components/VoiceInput";
 import { Card, ErrorBox, Loading } from "../components/ui";
 import { ASSISTANT_NAME } from "../config";
-import { km } from "../lib/format";
+import { km, timeAgo } from "../lib/format";
 import { currentPosition } from "../lib/geo";
 import { useAsync } from "../lib/useAsync";
 
@@ -24,6 +25,8 @@ export default function RoutePage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const { user } = useAuth();
+  const history = useAsync(() => (user ? api.routeHistory() : Promise.resolve([] as SavedRoute[])), [user?.id]);
 
   const byId = new Map(neighborhoods.data?.map((n) => [n.id, n]));
   const severity = new Map(ranking.data?.map((r) => [r.neighborhood_id, r.active_severity]));
@@ -34,6 +37,7 @@ export default function RoutePage() {
     setMessage(null);
     try {
       setRoute(await api.safeRoute(Number(a), Number(b)));
+      history.reload(); // queda guardada en "Mis rutas"
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
     }
@@ -58,6 +62,7 @@ export default function RoutePage() {
         setRoute(r.route);
         setFrom(String(r.route.from_neighborhood.id));
         setTo(String(r.route.to_neighborhood.id));
+        history.reload();
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
@@ -66,8 +71,21 @@ export default function RoutePage() {
     }
   };
 
+  const open = (r: SavedRoute) => {
+    setFrom(String(r.from_neighborhood.id));
+    setTo(String(r.to_neighborhood.id));
+    calc(String(r.from_neighborhood.id), String(r.to_neighborhood.id));
+  };
+
   return (
     <div className="stack-l">
+      {user && (
+        <MyRoutes
+          routes={history.data ?? []}
+          onOpen={open}
+          onChanged={history.reload}
+        />
+      )}
       <section className="voice-report card">
         <div className="voice-report-head">
           <span className="assistant-logo">
@@ -138,5 +156,75 @@ export default function RoutePage() {
         })}
       </BaseMap>
     </div>
+  );
+}
+
+/** Historial de rutas del usuario: cada ruta que consulta queda guardada y se abre con un clic. */
+function MyRoutes({ routes, onOpen, onChanged }: { routes: SavedRoute[]; onOpen: (r: SavedRoute) => void; onChanged: () => void }) {
+  const [editing, setEditing] = useState<number | null>(null);
+  const [label, setLabel] = useState("");
+
+  const save = async (id: number) => {
+    await api.renameRoute(id, label);
+    setEditing(null);
+    onChanged();
+  };
+  const remove = async (id: number) => {
+    await api.deleteRoute(id);
+    onChanged();
+  };
+
+  return (
+    <Card title={<><Icon name="clock" size={18} /> Mis rutas</>}>
+      {!routes.length ? (
+        <p className="muted">
+          Todavía no tienes rutas. Cada ruta que busques se guarda aquí (por ejemplo, de la U a tu casa) para abrirla otra vez sin buscarla.
+        </p>
+      ) : (
+        <div className="saved-routes">
+          {routes.map((r) => (
+            <div key={r.id} className="saved-route">
+              {editing === r.id ? (
+                <form
+                  className="row gap-s"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    save(r.id);
+                  }}
+                >
+                  <input autoFocus value={label} maxLength={60} placeholder="Ej: De la U a mi casa" onChange={(e) => setLabel(e.target.value)} />
+                  <button className="btn small">Guardar</button>
+                </form>
+              ) : (
+                <button className="saved-route-main" onClick={() => onOpen(r)} title="Abrir esta ruta">
+                  <Icon name="route" size={16} />
+                  <span>
+                    <b>{r.label ?? `${r.from_neighborhood.name} → ${r.to_neighborhood.name}`}</b>
+                    <small className="muted">
+                      {r.label ? `${r.from_neighborhood.name} → ${r.to_neighborhood.name} · ` : ""}
+                      {r.times_used} {r.times_used === 1 ? "vez" : "veces"} · {timeAgo(r.last_used_at)}
+                    </small>
+                  </span>
+                </button>
+              )}
+              <span className="row gap-s">
+                <button
+                  className="link-btn"
+                  onClick={() => {
+                    setEditing(editing === r.id ? null : r.id);
+                    setLabel(r.label ?? "");
+                  }}
+                >
+                  {editing === r.id ? "Cancelar" : "Nombrar"}
+                </button>
+                <button className="link-btn" onClick={() => remove(r.id)} aria-label="Borrar ruta">
+                  <Icon name="trash" size={14} />
+                </button>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
   );
 }
