@@ -10,7 +10,7 @@ import { SunEmblem } from "../components/Decor";
 import Logo from "../components/Logo";
 import { ErrorBox } from "../components/ui";
 import { timeAgo } from "../lib/format";
-import { ASSISTANT_NAME, CITY_NAME, PROFESOR_EMAIL, PROFESOR_PASSWORD } from "../config";
+import { ASSISTANT_NAME, CITY_NAME, PROFESOR_EMAIL, PROFESOR_PASSWORD, PROFESOR_USER_EMAIL } from "../config";
 import { PASSWORD_RULES, passwordBytes, passwordStrength } from "../lib/password";
 import { useAsync } from "../lib/useAsync";
 import NightScene from "../components/NightScene";
@@ -247,25 +247,37 @@ export function Login() {
             <span className="f-icon"><Icon name="shield" size={16} /></span>
             <b>Acceso para el profesor</b>
           </div>
-          <dl>
-            <dt>Correo</dt>
-            <dd>{PROFESOR_EMAIL}</dd>
-            <dt>Contraseña</dt>
-            <dd>{PROFESOR_PASSWORD}</dd>
-          </dl>
-          <button
-            type="button"
-            className="btn ghost block"
-            disabled={busy}
-            onClick={() => {
-              setKind("admin");
-              setEmail(PROFESOR_EMAIL);
-              setPassword(PROFESOR_PASSWORD);
-              void enter(PROFESOR_EMAIL, PROFESOR_PASSWORD, "admin", true);
-            }}
-          >
-            Entrar como profesor
-          </button>
+          {(
+            [
+              ["user", "user", "Como usuario (vecino)", PROFESOR_USER_EMAIL, "Entrar como usuario"],
+              ["admin", "shield", "Como administrador", PROFESOR_EMAIL, "Entrar como administrador"],
+            ] as const
+          ).map(([value, icon, title, mail, label]) => (
+            <div key={value} className="profe-account">
+              <p className="profe-sub">
+                <Icon name={icon} size={14} /> {title}
+              </p>
+              <dl>
+                <dt>Correo</dt>
+                <dd>{mail}</dd>
+                <dt>Contraseña</dt>
+                <dd>{PROFESOR_PASSWORD}</dd>
+              </dl>
+              <button
+                type="button"
+                className="btn ghost block"
+                disabled={busy}
+                onClick={() => {
+                  setKind(value);
+                  setEmail(mail);
+                  setPassword(PROFESOR_PASSWORD);
+                  void enter(mail, PROFESOR_PASSWORD, value, true);
+                }}
+              >
+                {label}
+              </button>
+            </div>
+          ))}
         </div>
       )}
     </AuthLayout>
