@@ -1358,3 +1358,103 @@ body { background: #05070d !important; }
 .doc-tag.ds { background: var(--primary-soft); color: var(--primary-dark); border-color: rgba(37, 99, 235, 0.3); }
 .doc-tag.cost { background: var(--green-soft); color: #15803d; border-color: rgba(34, 197, 94, 0.35); font-family: ui-monospace, Consolas, monospace; }
 .cat-row td { background: var(--surface-2); font-weight: 750; font-size: 0.86rem; letter-spacing: 0.02em; color: var(--primary-dark); padding-top: 12px !important; }
+
+/* =====================================================================
+   TEMA SEGURIDAD (rojo): reemplaza el fondo negro por un carmesí profundo
+   con estrellas y un escudo 3D con ondas de radar.
+   ===================================================================== */
+:root {
+  --primary: #be123c;
+  --primary-dark: #9f1239;
+  --primary-soft: rgba(190, 18, 60, 0.08);
+  --grad-blue: linear-gradient(180deg, #e11d48 0%, #be123c 100%);
+  --crimson-1: #1c0409;
+  --crimson-2: #4c0a18;
+  --crimson-3: #7f1626;
+  --sec-grad: linear-gradient(120deg, #f43f5e 0%, #be123c 55%, #881337 100%);
+}
+body { background: var(--crimson-1) !important; }
+.night-scene {
+  background: radial-gradient(1200px 700px at 70% 20%, rgba(244, 63, 94, 0.28), transparent 60%),
+    linear-gradient(180deg, var(--crimson-1) 0%, var(--crimson-2) 60%, var(--crimson-3) 100%) !important;
+}
+.night-shade { background: linear-gradient(180deg, rgba(28, 4, 9, 0.45) 0%, rgba(28, 4, 9, 0.18) 55%, rgba(28, 4, 9, 0.05) 100%) !important; }
+
+/* menu lateral */
+.sidebar {
+  background: radial-gradient(420px 300px at 0% 0%, rgba(244, 63, 94, 0.35), transparent 70%),
+    linear-gradient(180deg, #3b0812 0%, #26050c 55%, #160307 100%) !important;
+  box-shadow: inset -1px 0 0 rgba(251, 113, 133, 0.25), 18px 0 40px -24px rgba(0, 0, 0, 0.6) !important;
+}
+.side-link.active, .side-link[aria-current="page"] {
+  background: var(--sec-grad) !important; color: #fff !important; border-color: transparent !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 10px 24px -12px rgba(225, 29, 72, 0.9) !important;
+}
+.side-link:not(.active):hover { background: rgba(251, 113, 133, 0.16) !important; }
+.side-title { color: #fda4af !important; }
+.header { background: linear-gradient(180deg, rgba(28, 4, 9, 0.75), rgba(28, 4, 9, 0.35)) !important; border-bottom-color: rgba(251, 113, 133, 0.18) !important; }
+.header .icon-btn, .user-pill { background: linear-gradient(135deg, rgba(244, 63, 94, 0.22), rgba(136, 19, 55, 0.35)) !important; border-color: rgba(251, 113, 133, 0.35) !important; }
+.header .icon-btn:hover { background: linear-gradient(135deg, rgba(244, 63, 94, 0.4), rgba(136, 19, 55, 0.55)) !important; }
+.user-pill small { color: #fecdd3 !important; }
+
+/* botones principales y detalles */
+.btn:not(.ghost):not(.light):not(.glass):not(.link-btn):not(.warn) {
+  background: var(--sec-grad) !important; border-color: transparent !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 4px rgba(16, 24, 40, 0.15), 0 14px 30px -12px rgba(225, 29, 72, 0.85) !important;
+}
+.btn.ghost:hover { border-color: rgba(225, 29, 72, 0.45) !important; color: #be123c !important; }
+.fab { background: var(--sec-grad) !important; box-shadow: 0 14px 30px -12px rgba(225, 29, 72, 0.9), 0 0 24px -8px rgba(251, 191, 36, 0.6) !important; }
+.segmented button.on, .map-tool.on { background: var(--sec-grad) !important; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 6px 14px -8px rgba(225, 29, 72, 0.9) !important; }
+.chip.on { background: rgba(225, 29, 72, 0.1) !important; border-color: rgba(225, 29, 72, 0.45) !important; color: #9f1239 !important; }
+.icon-btn .count { background: #f59e0b !important; color: #1c0409 !important; box-shadow: 0 0 0 2px #2a0710, 0 0 10px rgba(245, 158, 11, 0.8) !important; }
+.panel:hover, .tile:not(.hot):hover, .recent-card:hover { border-color: rgba(225, 29, 72, 0.3) !important; }
+input:focus, select:focus, textarea:focus, .field input:focus, .field select:focus { border-color: #e11d48 !important; box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.14) !important; }
+.profe-card { border-color: rgba(225, 29, 72, 0.4) !important; background: rgba(225, 29, 72, 0.04) !important; }
+.chart .area-fill { fill: rgba(225, 29, 72, 0.14); }
+.chart .area-peak { fill: #f59e0b; }
+.hbar-track span, .vbar span { background: linear-gradient(90deg, #fb7185, #be123c) !important; }
+.vbar span { background: linear-gradient(180deg, #fb7185, #be123c) !important; }
+.splash { background: radial-gradient(700px 420px at 50% 45%, rgba(244, 63, 94, 0.3), transparent 70%), var(--crimson-1) !important; }
+/* la tarjeta "Alertas activas" sigue roja pero mas intensa para distinguirse del fondo */
+.tile.hot { background: linear-gradient(135deg, #ff4d6d 0%, #e11d48 60%, #be123c 100%) !important; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85), 0 14px 34px rgba(0, 0, 0, 0.35) !important; }
+
+/* escudo 3D con radar */
+.sec-emblem {
+  position: absolute; right: 4%; top: 18%; width: min(36vw, 460px); aspect-ratio: 1; display: grid; place-items: center;
+  perspective: 900px; opacity: 0.55;
+  transform: translate3d(calc(var(--mx) * -18px), calc(var(--my) * -12px), 0);
+}
+.sec-shield {
+  width: 46%; filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 30px rgba(244, 63, 94, 0.6));
+  transform: rotateY(calc(var(--mx) * 22deg - 14deg)) rotateX(calc(var(--my) * -14deg + 6deg));
+  animation: shieldFloat 6s ease-in-out infinite; transform-style: preserve-3d;
+}
+@keyframes shieldFloat { 50% { translate: 0 -10px; } }
+.sec-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(251, 113, 133, 0.5); animation: radarPing 4.5s ease-out infinite; }
+.sec-ring.r2 { animation-delay: 1.5s; }
+.sec-ring.r3 { animation-delay: 3s; }
+@keyframes radarPing { from { transform: scale(0.35); opacity: 0.9; } to { transform: scale(1); opacity: 0; } }
+.sec-sweep {
+  position: absolute; inset: 6%; border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(251, 113, 133, 0.38), rgba(251, 113, 133, 0) 70deg, transparent 360deg);
+  -webkit-mask: radial-gradient(circle, #000 0 69%, transparent 70%); mask: radial-gradient(circle, #000 0 69%, transparent 70%);
+  animation: radarSweep 5s linear infinite;
+}
+@keyframes radarSweep { to { transform: rotate(360deg); } }
+@media (max-width: 900px) { .sec-emblem { width: 70vw; right: -12%; top: 30%; opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .sec-ring, .sec-sweep, .sec-shield { animation: none; } }
+/* login y detalles que quedaban azules/negros */
+.auth-show {
+  background: radial-gradient(600px 400px at 80% 10%, rgba(244, 63, 94, 0.25), transparent 60%),
+    linear-gradient(180deg, rgba(60, 8, 20, 0.55), rgba(60, 8, 20, 0.2) 70%, rgba(60, 8, 20, 0)) !important;
+  border-color: rgba(251, 113, 133, 0.18) !important;
+}
+.features li { background: rgba(60, 8, 20, 0.55) !important; border-color: rgba(251, 113, 133, 0.18) !important; }
+.features li:hover { border-color: rgba(251, 113, 133, 0.55) !important; }
+.features .f-icon { color: #fda4af !important; background: rgba(251, 113, 133, 0.12) !important; border-color: rgba(251, 113, 133, 0.25) !important; }
+.btn.glass {
+  background: linear-gradient(120deg, rgba(251, 113, 133, 0.5) 0%, rgba(190, 18, 60, 0.6) 100%) !important;
+  border-color: rgba(254, 205, 211, 0.55) !important; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 8px 22px -10px rgba(190, 18, 60, 0.8) !important;
+}
+.btn.glass:hover:not(:disabled) { border-color: rgba(254, 205, 211, 0.9) !important; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 22px -4px rgba(244, 63, 94, 0.7) !important; }
+.badge-soft, .tag { background: rgba(225, 29, 72, 0.08); color: #9f1239; }
