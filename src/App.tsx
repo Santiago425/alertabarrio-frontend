@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Icon, { type IconName } from "./components/Icon";
 import { PhotoCredits } from "./components/Photos";
 import Logo from "./components/Logo";
+import NearbyAlerts from "./components/NearbyAlerts";
 import NightScene from "./components/NightScene";
 import { SunEmblem } from "./components/Decor";
 import { ASSISTANT_NAME, CITY_NAME, CITY_REGION, PROFESOR_EMAIL } from "./config";
@@ -176,6 +177,7 @@ function Shell() {
         </header>
 
         <main className="content">
+          <NearbyAlerts />
           <ErrorBoundary resetKey={location.pathname}>
           <Routes>
             <Route path="/" element={<Home />} />
