@@ -66,7 +66,7 @@ export default function ReportCard({ report, onChanged, actions }: Props) {
       <div className="row space wrap gap-s">
         <small className="muted">
           Reportado por {report.reporter_name}
-          {report.confirmations ? ` · ${report.confirmations} vecino(s) confirmaron` : ""}
+          {report.confirmations ? ` · ${report.confirmations} ${report.confirmations === 1 ? "vecino lo confirmó" : "vecinos lo confirmaron"}` : ""}
         </small>
         <div className="row gap-s">
           {canVerify && (

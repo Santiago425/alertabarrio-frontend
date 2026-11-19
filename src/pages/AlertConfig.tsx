@@ -201,7 +201,7 @@ export default function AlertConfig() {
             <tbody key={cat}>
               <tr className="cat-row">
                 <td colSpan={7}>
-                  {cat} <small className="muted">· {list.length} tipos</small>
+                  {cat} <small className="muted">· {list.length} {list.length === 1 ? "tipo" : "tipos"}</small>
                 </td>
               </tr>
               {list.map((t) => (
