@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../api/client";
 import type { ZoneStats } from "../api/types";
+import TypeOptions from "../components/TypeOptions";
 import HoodOptions from "../components/HoodOptions";
 import { Card, ErrorBox, Loading } from "../components/ui";
 import { CITY_NAME } from "../config";
@@ -67,11 +68,7 @@ export default function Stats() {
           Tipo de alerta
           <select value={type} onChange={(e) => setType(e.target.value)}>
             <option value="">Todos</option>
-            {types.data?.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
+            <TypeOptions types={types.data} />
           </select>
         </label>
       </div>

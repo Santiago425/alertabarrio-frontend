@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { CircleMarker, useMapEvents } from "react-leaflet";
 import { Link } from "react-router-dom";
+import TypeOptions from "../components/TypeOptions";
 import { api } from "../api/client";
 import type { ReportCreated } from "../api/types";
 import { ShieldArt } from "../components/Art";
@@ -152,12 +153,13 @@ export default function NewReport() {
           Tipo de incidente
           <select value={form.incident_type_id} onChange={set("incident_type_id")} required>
             <option value="">— Elegir —</option>
-            {types.data?.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name} (gravedad {t.severity_level})
-              </option>
-            ))}
+            <TypeOptions types={types.data} showSeverity />
           </select>
+          {types.data?.find((t) => String(t.id) === String(form.incident_type_id))?.code === "other" && (
+            <small className="muted">
+              ¿No está en la lista? Cuéntalo bien en la descripción. El administrador lo revisa y, si hace falta, crea el tipo nuevo.
+            </small>
+          )}
         </label>
         <label>
           Barrio <small className="muted">(sale solo del punto en el mapa)</small>

@@ -19,6 +19,7 @@ export interface IncidentType {
   color: string;
   duration_minutes?: number | null; // cuanto dura la alerta en el mapa (0 = no vence)
   is_active?: boolean;
+  category?: string | null; // Seguridad, Tránsito, Emergencias, Servicios públicos, Convivencia, Otros
 }
 
 export interface IncidentTypeAdmin extends IncidentType {
@@ -32,6 +33,7 @@ export interface IncidentTypeInput {
   color: string;
   duration_minutes: number;
   is_active: boolean;
+  category: string;
 }
 
 export interface SavedRoute {

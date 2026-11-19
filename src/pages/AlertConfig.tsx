@@ -3,6 +3,7 @@ import { api } from "../api/client";
 import type { IncidentTypeAdmin, IncidentTypeInput } from "../api/types";
 import Icon from "../components/Icon";
 import { Card, ErrorBox, Loading } from "../components/ui";
+import { groupByCategory, CATEGORY_ORDER } from "../components/TypeOptions";
 import { duration } from "../lib/format";
 import { useAsync } from "../lib/useAsync";
 
@@ -20,7 +21,7 @@ const DURATIONS = [
   { label: "No vence", value: 0 },
 ];
 
-const EMPTY: IncidentTypeInput = { name: "", severity_level: 3, color: "#0ea5e9", duration_minutes: 60, is_active: true };
+const EMPTY: IncidentTypeInput = { name: "", severity_level: 3, color: "#0ea5e9", duration_minutes: 60, is_active: true, category: "Seguridad" };
 
 /**
  * Panel del administrador: CONFIGURACION DE ALERTAS.
@@ -29,6 +30,7 @@ const EMPTY: IncidentTypeInput = { name: "", severity_level: 3, color: "#0ea5e9"
  */
 export default function AlertConfig() {
   const types = useAsync(() => api.adminTypes(), []);
+  const categories = useAsync(() => api.adminCategories().catch(() => CATEGORY_ORDER), []);
   const [form, setForm] = useState<IncidentTypeInput>(EMPTY);
   const [editing, setEditing] = useState<number | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -57,6 +59,7 @@ export default function AlertConfig() {
       color: t.color,
       duration_minutes: t.duration_minutes ?? 0,
       is_active: t.is_active ?? true,
+      category: t.category ?? "Otros",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -69,11 +72,11 @@ export default function AlertConfig() {
   const save = () =>
     run(async () => {
       if (editing) {
-        const t = await api.updateType(editing, form);
+        const t = await api.updateType(editing, { ...form, category: form.category.trim() });
         cancel();
         return `Se guardó "${t.name}". Las alertas de este tipo ahora duran ${duration(t.duration_minutes)} en el mapa.`;
       }
-      const t = await api.createType(form);
+      const t = await api.createType({ ...form, category: form.category.trim() });
       cancel();
       return `Se creó el tipo "${t.name}". Ya aparece para reportar y dura ${duration(t.duration_minutes)} en el mapa.`;
     });
@@ -123,6 +126,21 @@ export default function AlertConfig() {
             />
           </label>
           <label>
+            Categoría
+            <input
+              list="categorias"
+              value={form.category}
+              maxLength={40}
+              placeholder="Ej: Tránsito"
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+            />
+            <datalist id="categorias">
+              {(categories.data ?? CATEGORY_ORDER).map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+          </label>
+          <label>
             Duración en el mapa
             <select value={form.duration_minutes} onChange={(e) => setForm({ ...form, duration_minutes: Number(e.target.value) })}>
               {options.map((d) => (
@@ -152,7 +170,7 @@ export default function AlertConfig() {
           </label>
         </div>
         <div className="row gap-s wrap" style={{ marginTop: 14 }}>
-          <button className="btn" disabled={busy || form.name.trim().length < 3} onClick={save}>
+          <button className="btn" disabled={busy || form.name.trim().length < 3 || form.category.trim().length < 2} onClick={save}>
             <Icon name={editing ? "check" : "plus"} size={16} /> {editing ? "Guardar cambios" : "Crear tipo"}
           </button>
           {editing && (
@@ -179,8 +197,14 @@ export default function AlertConfig() {
                 <th />
               </tr>
             </thead>
-            <tbody>
-              {types.data?.map((t) => (
+            {groupByCategory(types.data ?? []).map(([cat, list]) => (
+            <tbody key={cat}>
+              <tr className="cat-row">
+                <td colSpan={7}>
+                  {cat} <small className="muted">· {list.length} tipos</small>
+                </td>
+              </tr>
+              {list.map((t) => (
                 <tr key={t.id} className={t.is_active ? "" : "row-off"}>
                   <td>
                     <span className="dot" style={{ background: t.color }} /> <b>{t.name}</b>
@@ -208,10 +232,12 @@ export default function AlertConfig() {
                 </tr>
               ))}
             </tbody>
+            ))}
           </table>
         </div>
         <p className="muted small-text">
-          Un tipo que ya tiene reportes no se borra (se perderían datos para las estadísticas): se desactiva y deja de aparecer para reportar.
+          Un tipo que ya tiene reportes o que es del catálogo base no se borra (se perderían datos para las estadísticas): se desactiva y deja de
+          aparecer para reportar. Para lo que no esté en la lista, el vecino puede elegir "Otro".
         </p>
       </Card>
     </div>

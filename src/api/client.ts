@@ -121,6 +121,7 @@ export const api = {
   withdraw: (id: number, note?: string) => post<Report>(`/api/v1/moderation/reports/${id}/withdraw`, { note }),
 
   // Configuracion de alertas (solo administrador)
+  adminCategories: () => request<string[]>("/api/v1/admin/incident-categories"),
   adminTypes: () => request<IncidentTypeAdmin[]>("/api/v1/admin/incident-types"),
   createType: (data: IncidentTypeInput) => post<IncidentTypeAdmin>("/api/v1/admin/incident-types", data),
   updateType: (id: number, data: Partial<IncidentTypeInput>) => patch<IncidentTypeAdmin>(`/api/v1/admin/incident-types/${id}`, data),
