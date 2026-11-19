@@ -46,7 +46,7 @@ export default function Moderation() {
   const publish = (id: number) =>
     run(async () => {
       const r = await api.publish(id);
-      return `Publicado #${id}. Se encolaron ${r.notifications_queued} notificaciones para los vecinos suscritos.`;
+      return `Publicado #${id}. Se enviaron ${r.notifications_queued} avisos a los vecinos suscritos.`;
     });
   const reject = (id: number) =>
     run(async () => {

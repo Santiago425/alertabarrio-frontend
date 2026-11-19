@@ -111,7 +111,7 @@ export default function NewReport() {
             <li>
               {ai.available ? (
                 <>
-                  La IA (<code>{ai.model}</code>) lo clasificó como <TypeBadge type={ai.suggested_type ?? report.incident_type} /> con
+                  La IA lo clasificó como <TypeBadge type={ai.suggested_type ?? report.incident_type} /> con
                   confianza {pct(ai.confidence)}
                   {ai.matches_user_choice === false && " (distinto a lo que elegiste, el moderador lo revisará)"}. Riesgo de la zona a
                   esa hora: <b>{pct(ai.zone_risk)}</b>.

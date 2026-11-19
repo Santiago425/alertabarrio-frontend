@@ -61,7 +61,7 @@ export default function Home() {
 
       <div className="dash-top">
         <div className="tiles">
-          <Tile tone="hot" icon="alert" title="Alertas activas" value={s?.active_alerts} sub={s ? `${s.by_status.verified} verificadas` : ""} to="/alertas" />
+          <Tile tone="hot" icon="alert" title="Alertas activas" value={s?.active_alerts} sub="en el mapa ahora" to="/alertas" />
           {isModerator ? (
             <Tile icon="shield" title="Por moderar" value={s?.pending_moderation} sub="en la cola" to="/moderacion" tint="#2563eb" />
           ) : (
@@ -367,7 +367,7 @@ function TopHoods({ rows }: { rows: RankingRow[] }) {
           <span className="rank">{i + 1}</span>
           <span className="name">
             <b>{r.neighborhood}</b>
-            <small>{r.subscribers} vecinos suscritos</small>
+            <small>{r.subscribers} {r.subscribers === 1 ? "vecino suscrito" : "vecinos suscritos"}</small>
           </span>
           <span className="value">{r.active_alerts}</span>
         </li>
