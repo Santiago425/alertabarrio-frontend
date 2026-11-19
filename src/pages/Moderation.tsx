@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../api/client";
 import type { StatusEntry } from "../api/types";
+import Icon from "../components/Icon";
 import ReportCard from "../components/ReportCard";
 import { Card, ErrorBox, HeapTree, Loading, StackView } from "../components/ui";
 import { STATUS_LABEL } from "../lib/format";
@@ -45,6 +46,11 @@ export default function Moderation() {
       await api.reject(id, "No cumple las normas o no es verificable");
       return `Rechazado #${id}.`;
     });
+  const withdraw = (id: number) =>
+    run(async () => {
+      await api.withdraw(id, "Retirada por el administrador: falsa o ya resuelta");
+      return `Retirada #${id}: ya no sale en el mapa. Queda guardada en el historial como rechazada (se puede deshacer).`;
+    });
   const undo = (id: number) =>
     run(async () => {
       const r = await api.undo(id);
@@ -54,12 +60,44 @@ export default function Moderation() {
 
   return (
     <div className="stack-l">
+      <section className="card mod-help">
+        <header className="row gap-s">
+          <Icon name="shield" size={22} />
+          <h3>¿Qué es la moderación?</h3>
+        </header>
+        <p className="muted">
+          Es el filtro antes de que una alerta llegue a todos. Así evitamos alertas falsas, repetidas u ofensivas.
+        </p>
+        <ol className="mod-steps">
+          <li>
+            <b>El vecino reporta.</b> El reporte queda <b>pendiente</b>: todavía nadie más lo ve.
+          </li>
+          <li>
+            <b>El administrador lo revisa</b> (sale primero el más grave) y decide: <b>Publicar</b> (sale en el mapa y se avisa a los vecinos
+            suscritos) o <b>Rechazar</b> (no se publica).
+          </li>
+          <li>
+            <b>La alerta vence sola</b> según su tipo (ver Configuración de alertas). Si era falsa, el administrador la puede <b>Retirar</b> antes.
+          </li>
+          <li>
+            Cualquier decisión se puede <b>Deshacer</b>. Nada se borra de la base de datos: todo queda para el historial y las estadísticas.
+          </li>
+        </ol>
+        <p className="mod-note">
+          <Icon name="lock" size={14} />
+          <span>
+            El usuario normal <b>no puede borrar ni editar alertas</b>, solo reportar y confirmar las de otros ("Yo también lo vi"). Solo el
+            administrador publica, rechaza o retira.
+          </span>
+        </p>
+      </section>
+
       {msg && <div className="alert-ok">{msg}</div>}
       <ErrorBox message={error} />
 
       <div className="two-col">
         <Card
-          title={<>Reportes por revisar ({queue.data?.size ?? 0})</>}
+          title={<>Pendientes por revisar ({queue.data?.size ?? 0})</>}
           actions={
             <button className="btn" onClick={takeNext} disabled={!queue.data?.size}>
               Tomar el siguiente más grave
@@ -113,16 +151,22 @@ export default function Moderation() {
         ))}
       </div>
 
-      <h3>Publicadas recientemente</h3>
+      <h3>En el mapa ahora</h3>
+      <p className="muted">Alertas publicadas que todavía no vencen. Si una es falsa o ya se resolvió, retírala del mapa.</p>
       <div className="stack-m">
         {published.data?.slice(0, 10).map((r) => (
           <ReportCard
             key={r.id}
             report={r}
             actions={
-              <button className="btn small warn" onClick={() => undo(r.id)}>
-                ↶ Deshacer publicación
-              </button>
+              <>
+                <button className="btn small ghost" onClick={() => withdraw(r.id)}>
+                  <Icon name="trash" size={14} /> Retirar del mapa
+                </button>
+                <button className="btn small warn" onClick={() => undo(r.id)}>
+                  ↶ Deshacer publicación
+                </button>
+              </>
             }
           />
         ))}

@@ -1288,3 +1288,57 @@ body { background: #05070d !important; }
 .side-link.active svg { color: #fff !important; }
 .side-link:not(.active):hover { background: linear-gradient(120deg, rgba(6, 182, 212, 0.14), rgba(124, 58, 237, 0.2)) !important; }
 .map-tool.on { background: linear-gradient(120deg, #06b6d4 0%, #4f46e5 55%, #7c3aed 100%) !important; color: #fff; }
+
+/* ---------------------------------------------- correcciones de la entrega */
+.info-card { display: flex; gap: 14px; align-items: flex-start; }
+.info-card > svg { flex: none; color: var(--primary); margin-top: 2px; }
+.info-card p { margin: 4px 0 0; }
+.config-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; align-items: end; }
+.config-form input[type="color"] { padding: 2px; height: 42px; cursor: pointer; }
+.check-label { flex-direction: row; align-items: center; gap: 8px; }
+.check-label input { width: auto; }
+.row-off td { opacity: 0.55; }
+.small-text { font-size: 0.84rem; margin: 10px 0 0; }
+
+.mod-help header h3 { margin: 0; }
+.mod-help header svg { color: var(--primary); }
+.mod-steps { margin: 10px 0; padding-left: 20px; display: grid; gap: 6px; }
+.mod-note { display: flex; gap: 8px; align-items: flex-start; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-s); padding: 10px 12px; margin: 0; font-size: 0.9rem; }
+.mod-note svg { flex: none; margin-top: 3px; }
+
+.saved-routes { display: grid; gap: 8px; }
+.saved-route { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid var(--border); border-radius: var(--radius-s); padding: 8px 12px; background: var(--surface-2); }
+.saved-route-main { display: flex; align-items: center; gap: 10px; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; text-align: left; min-width: 0; flex: 1; }
+.saved-route-main span { display: flex; flex-direction: column; min-width: 0; }
+.saved-route-main small { font-size: 0.78rem; }
+.saved-route-main:hover b { color: var(--primary); }
+
+.stats-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.stats-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+.kpi { display: flex; flex-direction: column; gap: 2px; }
+.kpi b { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.03em; }
+.kpi span { font-weight: 650; font-size: 0.9rem; }
+.chart { width: 100%; height: auto; display: block; }
+.chart .axis { font-size: 11px; fill: var(--muted); }
+.chart .bar-value { font-size: 11px; font-weight: 700; fill: var(--text); }
+.chart .grid-line { stroke: var(--border); stroke-dasharray: 3 4; }
+.chart .area-fill { fill: rgba(37, 99, 235, 0.15); }
+.chart .area-line { fill: none; stroke: var(--primary); stroke-width: 2.5; }
+.chart .area-peak { fill: #e11d48; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 0.82rem; color: var(--text-2); }
+.donut-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
+.donut-total { font-size: 22px; font-weight: 800; fill: var(--text); }
+.donut-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; flex: 1; min-width: 180px; font-size: 0.88rem; }
+.donut-list li { display: flex; align-items: center; gap: 4px; }
+.donut-list li b { margin-left: auto; }
+.hbars { display: grid; gap: 8px; }
+.hbar { display: grid; grid-template-columns: minmax(90px, 38%) 1fr 34px; align-items: center; gap: 10px; font-size: 0.88rem; }
+.hbar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbar-track { background: var(--surface-3); border-radius: 999px; height: 10px; overflow: hidden; }
+.hbar-track span { display: block; height: 100%; background: linear-gradient(90deg, #60a5fa, var(--primary)); border-radius: 999px; }
+.hbar b { text-align: right; }
+.vbars { display: flex; align-items: flex-end; gap: 8px; height: 180px; }
+.vbar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; font-size: 0.78rem; }
+.vbar span { width: 100%; max-width: 38px; background: linear-gradient(180deg, #60a5fa, var(--primary)); border-radius: 6px 6px 2px 2px; }
+.vbar small { color: var(--muted); }
+.donut-wrap .axis { font-size: 10px; fill: var(--muted); }

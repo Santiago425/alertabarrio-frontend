@@ -25,6 +25,8 @@ const PATHS: Record<string, string> = {
   check: "M5 12l5 5L20 7",
   arrowRight: "M5 12h14M13 6l6 6-6 6",
   mic: "M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3M8 21h8",
+  sliders: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M16 4v4M10 10v4M18 16v4",
+  trash: "M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13",
   book: "M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5zM4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5",
 };
 

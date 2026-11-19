@@ -6,6 +6,8 @@ import type {
   DashboardStats,
   Heatmap,
   IncidentType,
+  IncidentTypeAdmin,
+  IncidentTypeInput,
   ModerationQueue,
   Neighborhood,
   Notification,
@@ -14,12 +16,14 @@ import type {
   ReportCreated,
   ReportDraft,
   SafeRoute,
+  SavedRoute,
   StatusEntry,
   Subscription,
   TokenResponse,
   UndoResult,
   User,
   VoiceRoute,
+  ZoneStats,
 } from "./types";
 
 export { API_URL };
@@ -65,6 +69,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 }
 
 const post = <T>(path: string, body: unknown = {}) => request<T>(path, { method: "POST", body: JSON.stringify(body) });
+const patch = <T>(path: string, body: unknown = {}) => request<T>(path, { method: "PATCH", body: JSON.stringify(body) });
+const del = <T>(path: string) => request<T>(path, { method: "DELETE" });
 
 const qs = (params: Record<string, string | number | boolean | undefined | null>) => {
   const s = new URLSearchParams();
@@ -112,6 +118,16 @@ export const api = {
   publish: (id: number) => post<{ report: Report; notifications_queued: number }>(`/api/v1/moderation/reports/${id}/publish`),
   reject: (id: number, note?: string) => post<Report>(`/api/v1/moderation/reports/${id}/reject`, { note }),
   undo: (id: number) => post<UndoResult>(`/api/v1/moderation/reports/${id}/undo`),
+  withdraw: (id: number, note?: string) => post<Report>(`/api/v1/moderation/reports/${id}/withdraw`, { note }),
+
+  // Configuracion de alertas (solo administrador)
+  adminTypes: () => request<IncidentTypeAdmin[]>("/api/v1/admin/incident-types"),
+  createType: (data: IncidentTypeInput) => post<IncidentTypeAdmin>("/api/v1/admin/incident-types", data),
+  updateType: (id: number, data: Partial<IncidentTypeInput>) => patch<IncidentTypeAdmin>(`/api/v1/admin/incident-types/${id}`, data),
+  deleteType: (id: number) => del<{ deleted: boolean; deactivated: boolean; message: string }>(`/api/v1/admin/incident-types/${id}`),
+
+  zoneStats: (params: { months?: number; neighborhood_id?: number; comuna?: number; incident_type_id?: number } = {}) =>
+    request<ZoneStats>(`/api/v1/stats/zones${qs(params)}`),
 
   mySubscriptions: () => request<Subscription[]>("/api/v1/subscriptions/me"),
   subscribe: (nid: number) => post<{ subscribed: boolean }>(`/api/v1/subscriptions/${nid}`),
@@ -131,5 +147,8 @@ export const api = {
     request<DailySummary>(`/api/v1/ai/daily-summary${qs({ neighborhood_id: neighborhoodId, refresh })}`),
 
   safeRoute: (fromId: number, toId: number) => request<SafeRoute>(`/api/v1/routes/safe${qs({ from_id: fromId, to_id: toId })}`),
+  routeHistory: () => request<SavedRoute[]>("/api/v1/routes/history"),
+  renameRoute: (id: number, label: string) => patch<SavedRoute>(`/api/v1/routes/history/${id}`, { label }),
+  deleteRoute: (id: number) => del<{ deleted: boolean }>(`/api/v1/routes/history/${id}`),
   dsState: () => request<Record<string, unknown>>("/api/v1/ds/state"),
 };

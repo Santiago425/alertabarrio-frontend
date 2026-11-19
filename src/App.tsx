@@ -12,6 +12,7 @@ import { SunEmblem } from "./components/Decor";
 import { ASSISTANT_NAME, CITY_NAME, CITY_REGION, PROFESOR_EMAIL } from "./config";
 import { useAiOnline } from "./lib/useAiOnline";
 import { useAsync } from "./lib/useAsync";
+import AlertConfig from "./pages/AlertConfig";
 import Alerts from "./pages/Alerts";
 import { Account, Login, Register } from "./pages/Auth";
 import Docs from "./pages/Docs";
@@ -21,6 +22,7 @@ import MapPage from "./pages/MapPage";
 import Moderation from "./pages/Moderation";
 import Notifications from "./pages/Notifications";
 import RoutePage from "./pages/RoutePage";
+import Stats from "./pages/Stats";
 import VigiaPage from "./pages/VigiaPage";
 
 const TITLES: Record<string, string> = {
@@ -30,17 +32,20 @@ const TITLES: Record<string, string> = {
   "/vigia": ASSISTANT_NAME,
   "/rutas": "Ruta segura",
   "/moderacion": "Moderación",
+  "/estadisticas": "Estadísticas",
+  "/configuracion": "Configuración de alertas",
   "/documentacion": "Documentación",
   "/notificaciones": "Notificaciones",
   "/mis-reportes": "Mis reportes",
   "/cuenta": "Mi cuenta",
 };
 
-function Private({ children, moderator = false }: { children: ReactNode; moderator?: boolean }) {
+function Private({ children, moderator = false, admin = false }: { children: ReactNode; moderator?: boolean; admin?: boolean }) {
   const { user, loading, isModerator } = useAuth();
   if (loading) return <p className="muted">Cargando…</p>;
   if (!user) return <Navigate to="/login" replace />;
   if (moderator && !isModerator) return <p>Esta sección es solo para moderadores.</p>;
+  if (admin && user.role !== "admin") return <p>Esta sección es solo para el administrador.</p>;
   return <>{children}</>;
 }
 
@@ -115,7 +120,9 @@ function Shell() {
           <NavItem to="/alertas" icon="alert" label="Reportar y alertas" />
           <NavItem to="/vigia" icon="sparkles" label={ASSISTANT_NAME} />
           <NavItem to="/rutas" icon="route" label="Ruta segura" />
+          <NavItem to="/estadisticas" icon="chart" label="Estadísticas" />
           {isModerator && <NavItem to="/moderacion" icon="shield" label="Moderación" />}
+          {user?.role === "admin" && <NavItem to="/configuracion" icon="sliders" label="Configuración de alertas" />}
           <NavItem to="/documentacion" icon="book" label="Documentación" />
         </nav>
 
@@ -184,6 +191,8 @@ function Shell() {
             <Route path="/cuenta" element={<Private><Account /></Private>} />
             <Route path="/notificaciones" element={<Private><Notifications /></Private>} />
             <Route path="/moderacion" element={<Private moderator><Moderation /></Private>} />
+            <Route path="/estadisticas" element={<Stats />} />
+            <Route path="/configuracion" element={<Private admin><AlertConfig /></Private>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </ErrorBoundary>

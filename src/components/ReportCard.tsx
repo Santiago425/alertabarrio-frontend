@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { api } from "../api/client";
 import type { Report, StatusEntry } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
-import { pct, timeAgo } from "../lib/format";
+import { expiresIn, pct, timeAgo } from "../lib/format";
 import Icon from "./Icon";
 import { StackView, StatusBadge, TypeBadge } from "./ui";
 
@@ -33,14 +33,19 @@ export default function ReportCard({ report, onChanged, actions }: Props) {
   };
 
   const canVerify =
-    user && (report.status === "published" || report.status === "verified") && report.reporter_name !== user.full_name;
+    user && !report.expired && (report.status === "published" || report.status === "verified") && report.reporter_name !== user.full_name;
 
   return (
     <article className="report" style={{ borderLeftColor: report.incident_type.color }}>
       <div className="row space wrap gap-s">
         <div className="row gap-s wrap">
           <TypeBadge type={report.incident_type} />
-          <StatusBadge status={report.status} />
+          {report.expired ? <span className="badge status-rejected" title="Ya salió del mapa; sigue en el historial">Vencida</span> : <StatusBadge status={report.status} />}
+          {!report.expired && report.expires_at && (
+            <span className="badge" title="Cuando vence sale del mapa, pero queda en el historial">
+              <Icon name="clock" size={12} /> {expiresIn(report.expires_at)}
+            </span>
+          )}
           <span className="badge">Prioridad {report.priority_score}</span>
         </div>
         <small className="muted">

@@ -60,7 +60,7 @@ export default function DraftCard({ draft, onCancel }: { draft: ReportDraft; onC
         <div>
           <b>Reporte #{done.report.id} enviado</b>
           <small>
-            Está en moderación (posición {done.queue_position} de {done.queue_size}). Avisaremos a los vecinos de {done.report.neighborhood.name}.{" "}
+            Quedó pendiente: un administrador lo revisa antes de publicarlo (posición {done.queue_position} de {done.queue_size}). Avisaremos a los vecinos de {done.report.neighborhood.name}.{" "}
             <Link to="/mis-reportes">Ver mis reportes</Link>
           </small>
         </div>
