@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import HoodOptions from "./HoodOptions";
+import TypeOptions from "./TypeOptions";
 import { api } from "../api/client";
 import type { ReportCreated, ReportDraft } from "../api/types";
 import { useAsync } from "../lib/useAsync";
@@ -83,9 +84,7 @@ export default function DraftCard({ draft, onCancel }: { draft: ReportDraft; onC
           <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} aria-label="Descripción" />
           <div className="row gap-s wrap">
             <select value={form.incident_type_id} onChange={(e) => setForm({ ...form, incident_type_id: Number(e.target.value) })} aria-label="Tipo de incidente">
-              {types.data?.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
+              <TypeOptions types={types.data} />
             </select>
             <select value={form.neighborhood_id} onChange={(e) => setForm({ ...form, neighborhood_id: Number(e.target.value) })} aria-label="Barrio">
               <option value={0}>Barrio…</option>

@@ -130,7 +130,8 @@ export default function MapPage() {
           ))}
         </div>
         <div className="chips">
-          {types.data?.map((t) => (
+          {/* solo los tipos que tienen alertas en el mapa (hay ~50 tipos) */}
+          {types.data?.filter((t) => (counts[t.id] ?? 0) > 0 || hidden.has(t.id)).map((t) => (
             <button
               key={t.id}
               className={`chip ${hidden.has(t.id) ? "off" : ""}`}
