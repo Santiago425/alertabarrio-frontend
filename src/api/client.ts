@@ -127,7 +127,7 @@ export const api = {
   updateType: (id: number, data: Partial<IncidentTypeInput>) => patch<IncidentTypeAdmin>(`/api/v1/admin/incident-types/${id}`, data),
   deleteType: (id: number) => del<{ deleted: boolean; deactivated: boolean; message: string }>(`/api/v1/admin/incident-types/${id}`),
 
-  zoneStats: (params: { months?: number; neighborhood_id?: number; comuna?: number; incident_type_id?: number } = {}) =>
+  zoneStats: (params: { months?: number; month?: string; neighborhood_id?: number; comuna?: number; incident_type_id?: number } = {}) =>
     request<ZoneStats>(`/api/v1/stats/zones${qs(params)}`),
 
   mySubscriptions: () => request<Subscription[]>("/api/v1/subscriptions/me"),

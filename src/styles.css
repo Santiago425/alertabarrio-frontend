@@ -1524,3 +1524,15 @@ input:focus, select:focus, textarea:focus, .field input:focus, .field select:foc
 @media (max-width: 1024px) {
   .sidebar { position: fixed; z-index: 2000; }
 }
+/* Mapa de calor en Estadisticas */
+.heatmap-wrap { position: relative; }
+.heatmap-wrap .map { border-radius: 14px; }
+.heat-legend { position: absolute; left: 12px; bottom: 12px; z-index: 500; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.92); border: 1px solid #fecdd3; border-radius: 999px; padding: 5px 12px; font-size: 0.75rem; font-weight: 600; color: #881337; box-shadow: 0 6px 16px rgba(136, 19, 55, 0.15); }
+.heat-legend i { display: inline-block; width: 90px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #fb923c, #f43f5e, #dc2626, #7f1d1d); }
+.heat-hot { margin: 10px 0 0; font-size: 0.9rem; }
+.heat-hot b { color: #be123c; }
+
+/* Exportar reporte filtrado */
+.stats-export { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px dashed #fecdd3; }
+.stats-export .small-text { font-size: 0.85rem; }
+.stats-export b { color: #9f1239; }

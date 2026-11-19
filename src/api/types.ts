@@ -46,8 +46,27 @@ export interface SavedRoute {
   last_used_at: string;
 }
 
+export interface StatsRecord {
+  id: number;
+  date: string;
+  time: string;
+  type: string;
+  category: string;
+  title: string;
+  neighborhood: string;
+  comuna: number | null;
+  address: string;
+  status: string;
+}
+
 export interface ZoneStats {
   months: number;
+  /** AAAA-MM cuando se filtro un solo mes */
+  month?: string | null;
+  /** puntos para el mapa de calor (celdas de ~100 m) */
+  points?: { lat: number; lng: number; count: number }[];
+  /** reportes que cumplen el filtro, para exportar */
+  records?: StatsRecord[];
   total: number;
   active_now: number;
   expired: number;
