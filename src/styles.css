@@ -1501,3 +1501,11 @@ input:focus, select:focus, textarea:focus, .field input:focus, .field select:foc
   .pend-actions { grid-column: 1 / -1; flex-direction: row; justify-content: flex-end; }
   .urg-bar { margin-right: 58px; }
 }
+
+/* Mapa de calor en Estadisticas */
+.heatmap-wrap { position: relative; }
+.heatmap-wrap .map { border-radius: 14px; }
+.heat-legend { position: absolute; left: 12px; bottom: 12px; z-index: 500; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.92); border: 1px solid #fecdd3; border-radius: 999px; padding: 5px 12px; font-size: 0.75rem; font-weight: 600; color: #881337; box-shadow: 0 6px 16px rgba(136, 19, 55, 0.15); }
+.heat-legend i { display: inline-block; width: 90px; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #fb923c, #f43f5e, #dc2626, #7f1d1d); }
+.heat-hot { margin: 10px 0 0; font-size: 0.9rem; }
+.heat-hot b { color: #be123c; }
