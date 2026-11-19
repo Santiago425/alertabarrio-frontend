@@ -22,4 +22,6 @@ export const ASSISTANT_NAME = env.VITE_ASSISTANT_NAME ?? "Vigía";
 // Cuenta de revision del profesor: se muestra en el login con un boton para entrar directo.
 // La clave debe ser la misma que PROFESOR_PASSWORD en el backend (Render).
 export const PROFESOR_EMAIL = env.VITE_PROFESOR_EMAIL ?? "profesor@alertabarrio.co";
+// Segunda cuenta del profesor como vecino normal (misma clave), para probar la vista de usuario
+export const PROFESOR_USER_EMAIL = env.VITE_PROFESOR_USER_EMAIL ?? "vecino@alertabarrio.co";
 export const PROFESOR_PASSWORD = env.VITE_PROFESOR_PASSWORD ?? "Profe2026";
